@@ -1,0 +1,5 @@
+
+RewriteEngine On
+RewriteRule ^/?$ /main.php?page=1 [NC,L]
+RewriteRule ^logout/?$ /main.php?page=2  [NC,L]
+RewriteRule ^signup/?$ /main.php?page=3  [NC,L]
