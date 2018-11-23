@@ -21,22 +21,20 @@ function form_login() {
   }
 
   $fieldset->addElement('static')->setContent('
-<a href="/signup" class="btn btn-success active" role="button">Sign Up</a>
-<input type="submit" class="btn btn-primary" value="Login">');
+    <a href="/signup" class="btn btn-success active" role="button">Sign Up</a>
+    <input type="submit" class="btn btn-primary" value="Login">');
 
   if ($form->validate()) {
 
-      // Check if the input password matches the hash from the database
-      if (authenticate_user()) {
-        $_SESSION["msg"]["success"][] = "Welcome back ". $_SESSION["user"]["name"] . "!";
-
-      }
+    // Check if the input password matches the hash from the database
+    if (authenticate_user()) {
+      $_SESSION["msg"]["success"][] = "Welcome back ". $_SESSION["user"]["name"] . "!";
+    }
 
     header("Location: /");
     exit;
   }
   return $form;
-//  return str_replace('CONTENT', $html, file_get_contents("template/login.html"));
 
 }
 
@@ -46,11 +44,8 @@ function form_login() {
 ** Return: Boolean - result of the password comparison
 *********************************************************************/
 function authenticate_user() {
-  print "Starting Auth";
 
-  print_r($_POST);
   try {
-    print "Try";
     $sql = $GLOBALS["db"]->prepare('SELECT *
                           FROM user
                           WHERE email=:email');
@@ -58,7 +53,6 @@ function authenticate_user() {
     $sql->bindParam(':email', $_POST["email"]);
     $sql->execute();
     $row = $sql->fetch();
-    print_r($row);
 
     // If the supplied password matches they have authenticated
     if (count($row) > 0 && password_verify($_POST['pass'], $row['pass'])) {
