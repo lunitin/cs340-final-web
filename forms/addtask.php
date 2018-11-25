@@ -33,6 +33,7 @@ $r->setCallbackForClass('HTML_QuickForm2_Element', function($renderer, $element)
 $fieldset = $form->addElement('fieldset')->setLabel('Create Task')->addClass('form-horizontal');
 
 // Fetch the bucket list and format for the select list
+$bopts = array();
 $bucks = fetch_buckets();
 foreach($bucks as $k => $v) {
   $bopts[$v["bucket_id"]] = $v["bucket_name"];
@@ -46,10 +47,10 @@ $bucket = $fieldset->addElement(
                ->addRule('required', 'Bucket is required');
 
 // Fetch the categopy list and format for the select list
+$copts = array();
 $cats = fetch_categories();
-
 foreach($cats as $k => $v) {
- $copts[$v["category_id"]] = $v["category_name"];
+  $copts[$v["category_id"]] = $v["category_name"];
 }
 $category = $fieldset->addElement(
                'select',

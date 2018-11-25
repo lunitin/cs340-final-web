@@ -19,11 +19,10 @@ $( document ).ready(function() {
             data[input.attr('name')] = input.val();
         }
     );
-    console.log(data);
-    // POST form data back to PHP
+    // POST form data back to PHP and update bucket containers
     jQuery.post( "forms/addbucket.php", data, function( data ) {
-      console.log(data);
       parseFormResponse(data, "#addBucketFormContainer", "#addBucket" );
+      fetchBuckets();
     });
   });
 

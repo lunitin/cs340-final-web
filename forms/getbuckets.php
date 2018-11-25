@@ -1,13 +1,16 @@
 <?php
 include_once("../config.php");
+include_once("../common.php");
 
 
-$buckets = fetch_buckets();
 $code = 200;
+
+$_SESSION["msg"]["success"][] = "Buckets loaded";
+
 
 // Create a JSON object to send back to the frontend
 $resp['code'] = $code;
-$resp['html'] = $html;
+$resp['buckets'] = fetch_buckets();
 $resp['messages'] = $_SESSION["msg"];
 
 $_SESSION["msg"] = array();

@@ -35,6 +35,7 @@ switch($page) {
   case '4':
     $data['STR_TITLE'] = "Todo List";
     $data['STR_BODY'] = 'hi';
+    $template = file_get_contents('template/todo.html');
     break;
   case '3':
     $data['STR_TITLE'] = "Create an Account";

@@ -11,7 +11,10 @@ include_once("HTML/QuickForm2/Renderer.php");
 
 ob_start();
 session_start();
+if (!isset($_SESSION["msg"]))
+  $_SESSION["msg"] = array();
 
+  
 // Show errors for testing - Disable for prod
 ini_set('display_errors', 'on');
 
