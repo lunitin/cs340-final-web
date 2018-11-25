@@ -95,12 +95,12 @@ function save_user() {
      $_SESSION["msg"]["success"][] = "User ".$_POST["email"]." successfully added.";
      return true;
    } else {
-     $_SESSION["msg"]["error"][] = "ERROR: There was a problem processing your registration.";
+     $_SESSION["msg"]["danger"][] = "There was a problem processing your registration.";
 
    }
 
   } catch (\PDOException $e) {
-     $_SESSION["msg"]["error"][]  = "ERROR: ". $e->getMessage();
+     $_SESSION["msg"]["danger"][]  = "ERROR: PDO Insert Error";
   }
 
    return false;

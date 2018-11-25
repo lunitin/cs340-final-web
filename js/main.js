@@ -1,6 +1,10 @@
 $( document ).ready(function() {
 
-
+    // Fade out PHP generated alerts
+    $(".alert").fadeTo(3500, 600).slideUp(400, function () {
+        $(".alert").slideUp(600);
+        $(".alert").remove();
+    });
 
     // Load the Buckets
 

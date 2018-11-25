@@ -35,8 +35,8 @@ function fetch_messages() {
   if (isset($_SESSION["msg"]) && count($_SESSION["msg"] > 0) ) {
     $template = file_get_contents("template/alert.html");
 
-    if (isset($_SESSION["msg"]["error"])) {
-      foreach($_SESSION["msg"]["error"] as $k => $v) {
+    if (isset($_SESSION["msg"]["danger"])) {
+      foreach($_SESSION["msg"]["danger"] as $k => $v) {
         $html .= str_replace(array('TYPE', 'MSG'), array('alert-danger', $v), $template);
       }
     }
@@ -78,12 +78,22 @@ function fetch_buckets() {
 *********************************************************************/
 function fetch_categories() {
 
-  $sql = $GLOBALS["db"]->prepare('SELECT *
-                                  FROM categories
-                                  WHERE user_id=:user_id');
-  $sql->bindParam(':user_id', $_SESSION["user"]["user_id"]);
-  $sql->execute();
-  $rows = $sql->fetch();
+  try {
+    $sql = $GLOBALS["db"]->prepare('SELECT *
+                                    FROM categories
+                                    WHERE user_id=:user_id');
+    $sql->bindParam(':user_id', $_SESSION["user"]["user_id"]);
+    $sql->execute();
+    $rows = $sql->fetch();
+
+    $_SESSION["msg"]["success"][] = "Added Bucket ". $_POST["bucket_name"];
+
+
+  } catch (\PDOException $e) {
+    $_SESSION["msg"]["danger"][] = "PDO Exception on Insert";
+      return false;
+  }
+
 
   return $rows;
 }

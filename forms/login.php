@@ -67,11 +67,11 @@ function authenticate_user() {
       return true;
     }
 
-    $_SESSION["msg"]["error"][] = "ERROR: Log-in failure.";
+    $_SESSION["msg"]["danger"][] = "Log-in failure.";
     return false;
 
   } catch (\PDOException $e) {
-    $_SESSION["msg"]["error"][] = "ERROR: PDO Exception";
+    $_SESSION["msg"]["danger"][] = "PDO Exception";
       return false;
   }
 

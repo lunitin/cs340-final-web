@@ -20,7 +20,7 @@ define('DB_HOST', '127.0.0.1');
 define('DB_USER', 'todo');
 define('DB_DSN', 'mysql:host='.DB_HOST.';dbname='.DB_NAME.';charset=utf8mb4');
 
-// Password is kept outside docroot and will set DB_PASS
+// Password is kept outside docroot and will set DB_PASS and TOKEN_SALT
 include_once('/srv/clients/c2ws/www/config/todo-config.php');
 
 // Initiate PDO handler

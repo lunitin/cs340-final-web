@@ -141,8 +141,8 @@ function create_task() {
     print $id;
 
   } catch (\PDOException $e) {
-    //$_SESSION["msg"]["error"][] = "ERROR: PDO Exception on Insert";
-    print "Exception" . $e->getMessage();
+    $_SESSION["msg"]["danger"][] = "ERROR: PDO Exception on Insert";
+    //print "Exception" . $e->getMessage();
       return false;
   }
 
