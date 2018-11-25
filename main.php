@@ -8,10 +8,6 @@
 include_once('config.php');
 include_once('forms/login.php');
 include_once('forms/signup.php');
-include_once('HTML/QuickForm2.php');
-
-ob_start();
-session_start();
 
 $page = (int) $_GET["page"];
 
@@ -61,75 +57,4 @@ print str_replace(array_keys($data), $data, $template);
 
 
 print "<PRE>" . print_r($_SESSION, true)  . "</PRE>";
-
-
-/*********************************************************************
-** Function: verify_login
-** Description: Check if the browser has a valid session cookie
-** Return: Boolean - status of token check
-*********************************************************************/
-function verify_login() {
-
-  // If the hash in the cookie matches a calculated one, they have
-  // already authenticated
-  if (isset($_SESSION["user"]) ) {
-    return password_verify(TOKEN_SALT . $_SESSION["user"]["user_id"], $_SESSION["user"]["token"]);
-  }
-  return false;
-}
-
-/*********************************************************************
-** Function: fetch_messages
-** Description: Fetch any messages in the session
-** Return: HTML containing rendered message content
-*********************************************************************/
-function fetch_messages() {
-
-  $html = "";
-
-  if (isset($_SESSION["msg"]) && count($_SESSION["msg"] > 0) ) {
-    $template = file_get_contents("template/alert.html");
-
-    if (isset($_SESSION["msg"]["error"])) {
-      foreach($_SESSION["msg"]["error"] as $k => $v) {
-        $html .= str_replace(array('TYPE', 'MSG'), array('alert-danger', $v), $template);
-      }
-    }
-    if (isset($_SESSION["msg"]["success"])) {
-      foreach($_SESSION["msg"]["success"] as $k => $v) {
-        $html .= str_replace(array('TYPE', 'MSG'), array('alert-success', $v), $template);
-      }
-    }
-    // clear out the messages for next page change
-    $_SESSION["msg"] = array();
-  }
-  return $html;
-}
-
-
-
-/*********************************************************************
-** Function: fetch_buckets
-** Description: Fetch any buckets and inject them into the template
-** Return: HTML containing rendered bucket container
-*********************************************************************/
-function fetch_buckets() {
-
-  return $html;
-}
-
-
-/*********************************************************************
-** Function: fetch_actions() {
-** Description: Fetch any messages in the session
-** Return: HTML containing rendered message content
-*********************************************************************/
-function fetch_actions() {
-  // Cheap check for Login
-  if (isset($_SESSION["user"]["user_id"])) {
-    return file_get_contents("template/actions.html");
-  }
-
-}
-
 ?>

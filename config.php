@@ -5,6 +5,13 @@
 ** Date: 2018-11-21
 ** Description: Configuration details
 ********************************************************************/
+include_once('common.php');
+include_once("HTML/QuickForm2.php");
+include_once("HTML/QuickForm2/Renderer.php");
+
+ob_start();
+session_start();
+
 // Show errors for testing - Disable for prod
 ini_set('display_errors', 'on');
 
@@ -14,7 +21,7 @@ define('DB_USER', 'todo');
 define('DB_DSN', 'mysql:host='.DB_HOST.';dbname='.DB_NAME.';charset=utf8mb4');
 
 // Password is kept outside docroot and will set DB_PASS
-include_once('../config/todo-config.php');
+include_once('/srv/clients/c2ws/www/config/todo-config.php');
 
 // Initiate PDO handler
 $GLOBALS["db"] = new PDO(DB_DSN, DB_USER, DB_PASS,

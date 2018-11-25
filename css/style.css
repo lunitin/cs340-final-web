@@ -2,3 +2,8 @@
   background: #212529;
   color: #fff
 }
+
+.required {
+      color: #dc3545;
+      margin-right: 5px;
+}

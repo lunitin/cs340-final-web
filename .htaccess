@@ -3,3 +3,6 @@ RewriteEngine On
 RewriteRule ^/?$ /main.php?page=1 [NC,L]
 RewriteRule ^logout/?$ /main.php?page=2  [NC,L]
 RewriteRule ^signup/?$ /main.php?page=3  [NC,L]
+RewriteRule ^getbuckets/?$ /forms/getbuckets.php  [NC,L]
+RewriteRule ^getcategories/?$ /forms/getcategories.php  [NC,L]
+RewriteRule ^gettasks/?$ /forms/gettasks.php  [NC,L]
