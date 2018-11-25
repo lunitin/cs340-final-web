@@ -2,11 +2,7 @@
 include_once("../config.php");
 include_once("../common.php");
 
-
 $code = 200;
-
-$_SESSION["msg"]["success"][] = "Buckets loaded";
-
 
 // Create a JSON object to send back to the frontend
 $resp['code'] = $code;

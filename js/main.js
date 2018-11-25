@@ -7,20 +7,58 @@ $( document ).ready(function() {
     });
 
 
-    // Attach Events to Bucket container
+    // BUCKET HANDKERS
+    // Clicks on new and future bucket nav items
     $( '#buckets' ).on( 'click', 'li', function( event ) {
-      console.log( this ); // logs the list item that was clicked
+      console.log( this );
         fetchBuckets(this);
     });
+
 
     // Inject bucket objects
     // which will in turn inject category Objects
     // which will then ibject task objects
     fetchBuckets();
 
-    // Attach Event to Category container
-    $( '#categories' ).on( 'click', 'li.task', function( event ) {
-      console.log( this ); // logs the list item that was clicked
+
+    // CATEGORY HANDLERS
+    // EDIT CATEGORY
+    $( '#categories' ).on( 'click', 'i.c-edit', function( event ) {
+      console.log('Edit category');
+       console.log( $(this).attr('data-category-id'));
+    });
+
+    // DELETE CATEGORY
+    $( '#categories' ).on( 'click', 'i.c-rm', function( event ) {
+      console.log('Rm category');
+       console.log( $(this).attr('data-category-id') );
+    });
+
+
+    // TASK HANDLERS
+    // CREATE TASK
+    $( '#categories' ).on( 'click', 'i.t-add', function( event ) {
+      console.log('Add task');
+       console.log( $(this).attr('data-category-id') );
+    });
+
+    // EDIT TASK
+    $( '#categories' ).on( 'click', 'i.t-edit', function( event ) {
+      console.log('Edit task');
+       console.log( $(this).attr('data-task-id'));
+    });
+
+    // DELETE TASK
+    $( '#categories' ).on( 'click', 'i.t-rm', function( event ) {
+      console.log('Rm task');
+       console.log( $(this).attr('data-task-id') );
+    });
+
+
+    // DRAGGING 7 DROPPING TASKS
+    // Attach Event to Category container for dragging of task rows
+    $( '#categories' ).on( 'click', 'li.list-group-item', function( event ) {
+      console.log( this );
     });
 
     // Construct Task objects
@@ -65,15 +103,14 @@ function fetchBuckets(elem) {
         var id = 'bucket_' + buckets[i]['bucket_id'];
         var current = '';
         // If nothing was clicked, set the first bucket as default
-        if ($.isEmptyObject(elem) && i == 0) {
-          item.classList.add('active');
-          $('#bucketTitle').html(buckets[i]['bucket_title']);
+        if ($.isEmptyObject(elem) && i == 0 ||
+            !$.isEmptyObject(elem) && elem.id == id) {
+
           current = id;
-        } else
-        if (!$.isEmptyObject(elem) && elem.id == id) {
           item.classList.add('active');
-          $('#bucketTitle').html(buckets[i]['bucket_title']);
-          current = id;
+          $('#bucketTitle').html( buckets[i]['bucket_title']);
+          $('#addNewCategory, #rmBucket').attr('data-bucket-id', buckets[i]['bucket_id']);
+
         }
 
         // Load categories for the default bucket

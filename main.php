@@ -34,7 +34,7 @@ switch($page) {
 
   case '4':
     $data['STR_TITLE'] = "Todo List";
-    $data['STR_BODY'] = 'hi';
+    $data['STR_BODY'] = '';
     $template = file_get_contents('template/todo.html');
     break;
   case '3':

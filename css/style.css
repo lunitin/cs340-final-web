@@ -7,3 +7,10 @@
       color: #dc3545;
       margin-right: 5px;
 }
+#pageTitle i, .task-tools i {
+  margin: 0 5px 0 5px;
+}
+
+.nav-link {
+  width:100px;
+}
