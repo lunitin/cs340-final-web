@@ -42,7 +42,7 @@ $( document ).ready(function() {
   $('#submitAddCategory').click( function(data) {
     data = {};
     // Collect form data and send it back to QuickForm
-    $('#add_category input').each(
+    $('#add_category input, #add_category select').each(
         function(index){
             var input = $(this);
             data[input.attr('name')] = input.val();

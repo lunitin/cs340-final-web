@@ -6,6 +6,7 @@
 ** Description: Primary controller
 ********************************************************************/
 include_once('config.php');
+include_once('common.php');
 include_once('forms/login.php');
 include_once('forms/signup.php');
 

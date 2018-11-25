@@ -1,5 +1,6 @@
 <?php
-include_once("config.php");
+include_once("../config.php");
+include_once("../common.php");
 
 
 $form = new HTML_QuickForm2('addtask', 'POST');
@@ -31,22 +32,32 @@ $r->setCallbackForClass('HTML_QuickForm2_Element', function($renderer, $element)
 // Create a field set and add all fields to the form
 $fieldset = $form->addElement('fieldset')->setLabel('Create Task')->addClass('form-horizontal');
 
-
- $title = $fieldset->addElement(
-                 ('text'),
-                 'bucket_id',
-                 array('size' => 50))
-                ->setLabel('Bucket ID:')
-                ->addClass('form-control')
-                ->addRule('required', 'Bucket Id is required');
-
-$title = $fieldset->addElement(
-                ('text'),
-                'category_id',
-                array('size' => 50))
-               ->setLabel('Category ID:')
+// Fetch the bucket list and format for the select list
+$bucks = fetch_buckets();
+foreach($bucks as $k => $v) {
+  $bopts[$v["bucket_id"]] = $v["bucket_name"];
+}
+$bucket = $fieldset->addElement(
+                'select',
+                'bucket_id')
+                ->loadOptions($bopts)
+               ->setLabel('Bucket:')
                ->addClass('form-control')
-               ->addRule('required', 'Category Id is required');
+               ->addRule('required', 'Bucket is required');
+
+// Fetch the categopy list and format for the select list
+$cats = fetch_categories();
+
+foreach($cats as $k => $v) {
+ $copts[$v["category_id"]] = $v["category_name"];
+}
+$category = $fieldset->addElement(
+               'select',
+               'category_id')
+               ->loadOptions($copts)
+              ->setLabel('Category:')
+              ->addClass('form-control')
+              ->addRule('required', 'Category is required');
 
 $name = $fieldset->addElement(
                ('text'),

@@ -32,15 +32,15 @@ function fetch_messages() {
 
   $html = "";
 
-  if (isset($_SESSION["msg"]) && count($_SESSION["msg"] > 0) ) {
+  if (isset($_SESSION["msg"]) && count($_SESSION["msg"]) > 0 ) {
     $template = file_get_contents("template/alert.html");
 
-    if (isset($_SESSION["msg"]["danger"])) {
+    if (isset($_SESSION["msg"]["danger"]) && count($_SESSION["msg"]["danger"]) > 0 ) {
       foreach($_SESSION["msg"]["danger"] as $k => $v) {
         $html .= str_replace(array('TYPE', 'MSG'), array('alert-danger', $v), $template);
       }
     }
-    if (isset($_SESSION["msg"]["success"])) {
+    if (isset($_SESSION["msg"]["success"]) && count($_SESSION["msg"]["success"]) > 0) {
       foreach($_SESSION["msg"]["success"] as $k => $v) {
         $html .= str_replace(array('TYPE', 'MSG'), array('alert-success', $v), $template);
       }
@@ -62,10 +62,11 @@ function fetch_buckets() {
 
   $sql = $GLOBALS["db"]->prepare('SELECT *
                                   FROM buckets
-                                  WHERE user_id=:user_id');
+                                  WHERE user_id=:user_id
+                                  ORDER by sort_weight');
   $sql->bindParam(':user_id', $_SESSION["user"]["user_id"]);
   $sql->execute();
-  $rows = $sql->fetch();
+  $rows = $sql->fetchAll();
 
   return $rows;
 }
@@ -81,21 +82,20 @@ function fetch_categories() {
   try {
     $sql = $GLOBALS["db"]->prepare('SELECT *
                                     FROM categories
-                                    WHERE user_id=:user_id');
+                                    WHERE user_id=:user_id
+                                    ORDER by sort_weight');
+                                    
     $sql->bindParam(':user_id', $_SESSION["user"]["user_id"]);
     $sql->execute();
-    $rows = $sql->fetch();
+    $rows = $sql->fetchAll();
 
-    $_SESSION["msg"]["success"][] = "Added Bucket ". $_POST["bucket_name"];
-
+    return $rows;
 
   } catch (\PDOException $e) {
     $_SESSION["msg"]["danger"][] = "PDO Exception on Insert";
       return false;
   }
 
-
-  return $rows;
 }
 
 

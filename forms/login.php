@@ -4,6 +4,30 @@
 function form_login() {
   $form = new HTML_QuickForm2('login', 'POST', array('action' => '/'));
 
+  // Create a custom renderer for BootStrap
+  $r = HTML_QuickForm2_Renderer::factory('callback');
+  $r->setCallbackForClass('HTML_QuickForm2_Element', function($renderer, $element) {
+      $error = $element->getError();
+      if ($error) {
+          $html[] = '<div class="clearfix form-group">';
+          $element->addClass('is-invalid');
+      } else {
+          $html[] = '<div class="clearfix form-group">';
+      }
+      $html[] = $renderer->renderLabel($element->addClass('red'));
+      $html[] = '<div class="input">'.$element;
+      if ($error) {
+          $html[] = '<span class="invalid-feedback">'.$error.'</span>';
+      } else {
+          $label = $element->getLabel();
+        if (is_array($label) && !empty($label[1])) {
+              $html[] = '<span class=" valid-feedback">'.$label[1].'</span>';
+        }
+      }
+      $html[] = '</div></div>';
+      return implode('', $html);
+  });
+
   // Define all fields and add them all to the form
   $field_def = array('email'  => 'Enter your E-mail address:',
                      'pass'  => 'Enter a password:');
@@ -34,7 +58,11 @@ function form_login() {
     header("Location: /");
     exit;
   }
-  return $form;
+
+  ob_start();
+  print $form->render($r);
+  $html = ob_get_clean();
+  return $html;
 
 }
 

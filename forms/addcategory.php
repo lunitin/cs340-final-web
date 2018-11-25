@@ -1,5 +1,6 @@
 <?php
 include_once("../config.php");
+include_once('../common.php');
 
 
 $form = new HTML_QuickForm2('add_category', 'POST');
@@ -40,13 +41,19 @@ $name = $fieldset->addElement(
                ->addClass('form-control')
                ->addRule('required', 'Category Name is required');
 
- $title = $fieldset->addElement(
-                 ('text'),
-                 'bucket_id',
-                 array('size' => 50))
-                ->setLabel('Bucket Id:')
+ // Fetch the bucket list and format for the select list
+ $bucks = fetch_buckets();
+ foreach($bucks as $k => $v) {
+   $bopts[$v["bucket_id"]] = $v["bucket_name"];
+ }
+ $buckets = $fieldset->addElement(
+                 'select',
+                 'bucket_id')
+                 ->loadOptions($bopts)
+                ->setLabel('Bucket:')
                 ->addClass('form-control')
-                ->addRule('required', 'Bucket Id is required');
+                ->addRule('required', 'Bucket is required');
+
 
 
 //
