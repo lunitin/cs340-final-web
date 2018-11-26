@@ -38,8 +38,7 @@ function form_login() {
   foreach ($field_def as $name => $msg) {
     $fields[$name] = $fieldset->addElement(
                     ( $name == 'pass' ? 'password' : 'text'),
-                    $name,
-                    array('size' => 50))
+                    $name)
                    ->setLabel($msg)
                    ->addRule('required', $name .' is required');
   }

@@ -32,7 +32,9 @@ $( document ).ready(function() {
   // Fetch the form and put it in the modal on click
   $('#addCategory').on('show.bs.modal', function (e) {
 
-      jQuery.get( "forms/addcategory.php", function( data ) {
+   var bucket_id = $('#buckets li.active').attr('data-bucket-id');
+
+      jQuery.get( "forms/addcategory.php?bucket_id="+ bucket_id, function( data ) {
         parseFormResponse(data, "#addCategoryFormContainer", "#addCategory" );
       });
     })
@@ -48,11 +50,51 @@ $( document ).ready(function() {
         }
     );
 
+    data['bucket_id'] = $('#buckets li.active').attr('data-bucket-id');
     // POST form data back to PHP
     jQuery.post( "forms/addcategory.php", data, function( data ) {
       parseFormResponse(data, "#addCategoryFormContainer", "#addCategory" );
     });
   });
+
+  // TASK EVENTS
+  $('#addTask').on('show.bs.modal', function (e) {
+
+      // Save the category id of the caller on the submit  button
+      // for easy access on submit
+      caller = $(e.relatedTarget);
+      console.log(caller.attr('data-category-id'));
+      $('#submitAddTask').attr('data-category-id', caller.attr('data-category-id'));
+
+      var bucket_id = $('#buckets li.active').attr('data-bucket-id');
+      var category_id = caller.attr('data-category-id');
+
+      jQuery.get( "forms/addtask.php?bucket_id="+bucket_id+"&category_id="+category_id, function( data ) {
+        parseFormResponse(data, "#addTaskFormContainer", "#addTask" );
+      });
+    })
+
+  // Submit button function handler
+  $('#submitAddTask').click( function(data) {
+    data = {};
+    // Collect form data and send it back to QuickForm
+    $('#add_task input, #add_task select').each(
+        function(index){
+            var input = $(this);
+            data[input.attr('name')] = input.val();
+        }
+    );
+    data['bucket_id'] = $('#buckets li.active').attr('data-bucket-id');
+    data['category_id'] = $('#submitAddTask').attr('data-category-id');
+
+    console.log(data);
+
+    // POST form data back to PHP
+    jQuery.post( "forms/addtask.php", data, function( data ) {
+      parseFormResponse(data, "#addTaskFormContainer", "#addTask" );
+    });
+  });
+
 
 });
 

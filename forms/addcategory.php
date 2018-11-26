@@ -30,6 +30,13 @@ $r->setCallbackForClass('HTML_QuickForm2_Element', function($renderer, $element)
 });
 
 
+
+// Set defaults for the form elements
+$form->addDataSource(new HTML_QuickForm2_DataSource_Array(array(
+    'bucket_id' => (  isset($_GET['bucket_id']) ? (int) $_GET['bucket_id'] : ''),
+)));
+
+
 // Create a field set and add all fields to the form
 $fieldset = $form->addElement('fieldset')->addClass('form-horizontal');
 

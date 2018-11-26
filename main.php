@@ -43,7 +43,10 @@ switch($page) {
     break;
   case '2': // Logout
     $_SESSION = array();
-    $_SESSION["msg"]["success"] = "You have been logged out";
+    $_SESSION['msg'] = array();
+    $_SESSION["msg"]["success"][] = "You have been logged out";
+    header('Location: /');
+    exit;
   case '1':
   default:
     $data['STR_TITLE'] = "Log in";
@@ -58,5 +61,5 @@ $data['STR_BUCKETS'] = '';
 print str_replace(array_keys($data), $data, $template);
 
 
-print "<PRE>" . print_r($_SESSION, true)  . "</PRE>";
+//print "<PRE>" . print_r($_SESSION, true)  . "</PRE>";
 ?>

@@ -84,7 +84,7 @@ function fetch_categories() {
                                     FROM categories
                                     WHERE user_id=:user_id
                                     ORDER by sort_weight');
-                                    
+
     $sql->bindParam(':user_id', $_SESSION["user"]["user_id"]);
     $sql->execute();
     $rows = $sql->fetchAll();
@@ -92,7 +92,33 @@ function fetch_categories() {
     return $rows;
 
   } catch (\PDOException $e) {
-    $_SESSION["msg"]["danger"][] = "PDO Exception on Insert";
+    $_SESSION["msg"]["danger"][] = "PDO Exception on cat select";
+      return false;
+  }
+
+}
+
+/*********************************************************************
+** Function: fetch_categories
+** Description: Fetch any categories for this user
+** Return: array() of category tuples
+*********************************************************************/
+function fetch_tasks($bucket_id) {
+
+  try {
+    $sql = $GLOBALS["db"]->prepare('SELECT *
+                                    FROM tasks
+                                    WHERE bucket_id=:bucket_id
+                                    ORDER by sort_weight');
+
+    $sql->bindParam(':bucket_id', $bucket_id);
+    $sql->execute();
+    $rows = $sql->fetchAll();
+
+    return $rows;
+
+  } catch (\PDOException $e) {
+    $_SESSION["msg"]["danger"][] = "PDO Exception on task select";
       return false;
   }
 

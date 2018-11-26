@@ -46,15 +46,14 @@ function form_signup() {
 
   $fieldset = $form->addElement('fieldset')->setLabel('Create Account');
 
-  $age = $fieldset->addElement('text', 'name',
-                 array('size' => 40))
+  $age = $fieldset->addElement('text', 'name')
                 ->setLabel('Name:')
                 ->addRule('Required', 'Name is required');
 
 
   // Add unique elements to the form with unique paramters and rules
   $user = $fieldset->addElement('text', 'email',
-                  array('size' => 50, 'maxlength' => 20))
+                  array('maxlength' => 20))
                  ->setLabel('Email Address:');
 
   $user->addRule('required', 'Email is required')
@@ -62,7 +61,7 @@ function form_signup() {
 
   // Leverage browser enforced length limits
   $pass = $fieldset->addElement('password', 'password',
-                  array('size' => 50, 'minlength' => 6, 'maxlength' => 40))
+                  array('minlength' => 6, 'maxlength' => 40))
                  ->setLabel('Password: (minimum length 6, maximum length 40)');
 
   // Add PHP based limits to stop direct _POST attempts from bypassing rules

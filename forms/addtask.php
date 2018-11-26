@@ -3,7 +3,7 @@ include_once("../config.php");
 include_once("../common.php");
 
 
-$form = new HTML_QuickForm2('addtask', 'POST');
+$form = new HTML_QuickForm2('add_task', 'POST');
 
 // Create a custom renderer for BootStrap
 $r = HTML_QuickForm2_Renderer::factory('callback');
@@ -29,8 +29,15 @@ $r->setCallbackForClass('HTML_QuickForm2_Element', function($renderer, $element)
     return implode('', $html);
 });
 
+// Set defaults for the form elements
+$form->addDataSource(new HTML_QuickForm2_DataSource_Array(array(
+    'bucket_id' => (  isset($_GET['bucket_id']) ? (int) $_GET['bucket_id'] : ''),
+    'category_id' => ( isset($_GET['category_id']) ? (int) $_GET['category_id']  : '')
+)));
+
+
 // Create a field set and add all fields to the form
-$fieldset = $form->addElement('fieldset')->setLabel('Create Task')->addClass('form-horizontal');
+$fieldset = $form->addElement('fieldset')->addClass('form-horizontal');
 
 // Fetch the bucket list and format for the select list
 $bopts = array();
