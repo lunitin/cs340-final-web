@@ -38,6 +38,13 @@ if (verify_login()) {
       return implode('', $html);
   });
 
+  if (isset($_GET["bucket_id"])) {
+    $defaults = load_bucket( (int) $_GET["bucket_id"]);
+    // Set defaults for the form elements
+    $form->addDataSource(new HTML_QuickForm2_DataSource_Array($defaults));
+    $form->addElement('hidden', 'bucket_id');
+  }
+
 
   // Create a field set and add all fields to the form
   $fieldset = $form->addElement('fieldset')->addClass('form-horizontal');
@@ -61,12 +68,20 @@ if (verify_login()) {
   $code = 200;
   if ($form->validate()) {
 
-      if (create_bucket()) {
-        $code = '201';
-        $resp['bucket_id'] = $GLOBALS["db"]->lastInsertId();
-      } else {
-        $code = '501';
-      }
+    if (isset($_POST["bucket_id"])) {
+      $action = update_bucket();
+      $resp['bucket_id'] = $_POST["bucket_id"];
+    } else {
+      $action = create_bucket();
+      $resp['bucket_id'] = $GLOBALS["db"]->lastInsertId();
+    }
+
+    if ($action) {
+      $code = '201';
+      $resp['bucket_id'] = $GLOBALS["db"]->lastInsertId();
+    } else {
+      $code = '501';
+    }
 
   }
 
@@ -123,10 +138,73 @@ function create_bucket() {
 
 
   } catch (\PDOException $e) {
-    $_SESSION["msg"]["danger"][] = "ERROR: PDO Exception on Insert";
+    $_SESSION["msg"]["danger"][] = "ERROR: PDO Exception on insert.";
       return false;
   }
 
+}
+
+/*********************************************************************
+** Function: update_bucket
+** Description: Update an existing bucket
+** Return: Boolean - result of the update query
+*********************************************************************/
+function update_bucket() {
+
+  try {
+
+    $sql = $GLOBALS["db"]->prepare('UPDATE buckets
+                          SET
+                          bucket_name = :bucket_name,
+                          bucket_title = :bucket_title
+                          WHERE
+                          bucket_id = :bucket_id
+                          AND user_id = :user_id');
+
+    $sql->bindParam(':bucket_id', $_POST["bucket_id"]);
+    $sql->bindParam(':user_id', $_SESSION["user"]["user_id"]);
+    $sql->bindParam(':bucket_name', $_POST["bucket_name"]);
+    $sql->bindParam(':bucket_title', $_POST["bucket_title"]);
+    $sql->execute();
+
+    if ($sql->rowCount() > 0) {
+        return true;
+    } else {
+        return false;
+    }
+
+
+  } catch (\PDOException $e) {
+    $_SESSION["msg"]["danger"][] = "ERROR: PDO Exception on update.";
+    return false;
+  }
+}
+
+/*********************************************************************
+** Function: load_bucket
+** Description: Load a single bucket from the db
+** Return: array - result of the select query
+*********************************************************************/
+function load_bucket($bucket_id) {
+
+  try {
+
+    $sql = $GLOBALS["db"]->prepare('SELECT *
+                                    FROM buckets
+                                    WHERE user_id=:user_id
+                                    AND bucket_id=:bucket_id');
+
+    $sql->bindParam(':user_id', $_SESSION["user"]["user_id"]);
+    $sql->bindParam(':bucket_id', $bucket_id);
+    $sql->execute();
+
+    $row = $sql->fetch();
+    return $row;
+
+  } catch (\PDOException $e) {
+    $_SESSION["msg"]["danger"][] = "ERROR: PDO Exception on select.";
+    return false;
+  }
 
 }
 

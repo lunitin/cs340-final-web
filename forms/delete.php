@@ -13,11 +13,7 @@ $resp = array();
 // Check for authentication token
 if (verify_login()) {
 
-  if(delete_item()) {
-    $code = 201;
-  } else {
-    $code = 500;
-  }
+  $code = delete_item();
 
 } else {
   $code = 500;
@@ -38,39 +34,49 @@ print json_encode($resp);
 *********************************************************************/
 function delete_item() {
 
+  $code = 201;
   // Look up table and primary key names
   switch($_GET["type"]) {
     case 'bucket':
-      $stmt = 'DELETE FROM buckets WHERE user_id=:user_id AND bucket_id=:id';
+      $sql = $GLOBALS["db"]->prepare('DELETE FROM buckets WHERE user_id=:user_id AND bucket_id=:id');
+      $sql->bindParam(':id', $_GET["id"]);
       break;
     case 'category':
-      $stmt = 'DELETE FROM categories WHERE user_id=:user_id AND category_id=:id';
+      $sql = $GLOBALS["db"]->prepare('DELETE FROM categories WHERE user_id=:user_id AND category_id=:id');
+      $sql->bindParam(':id', $_GET["id"]);
       break;
     case 'task':
-      $stmt = 'DELETE FROM tasks WHERE user_id=:user_id AND task_id=:id';
+      $sql = $GLOBALS["db"]->prepare('DELETE FROM tasks WHERE user_id=:user_id AND task_id=:id');
+      $sql->bindParam(':id', $_GET["id"]);
+      break;
+    case 'user':
+      $sql = $GLOBALS["db"]->prepare('DELETE FROM user WHERE user_id=:user_id');
+      $code = 206;
       break;
     default:
       $_SESSION["msg"]["danger"][] = "Invalid type passed.";
-      return false;
+      return 500;
   }
 
 
   try {
-    $sql = $GLOBALS["db"]->prepare($stmt);
     $sql->bindParam(':user_id', $_SESSION["user"]["user_id"]);
-    $sql->bindParam(':id', $_GET["id"]);
     $sql->execute();
 
     if ($sql->rowCount() > 0) {
-        return true;
+      // Deleted account so reset auth token
+      if ($code == 206) {
+        $_SESSION["user"] = array();
+      }
+        return $code;
     } else {
-        return false;
+        return 500;
     }
 
 
   } catch (\PDOException $e) {
-    $_SESSION["msg"]["danger"][] = "ERROR: PDO Exception on delete". $e->getMessage();
-    return false;
+    $_SESSION["msg"]["danger"][] = "ERROR: PDO Exception on delete";
+    return 500;
   }
 
 

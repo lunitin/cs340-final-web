@@ -17,8 +17,8 @@ function verify_login() {
 
   // If the hash in the cookie matches a calculated one, they have
   // already authenticated
-  if (isset($_SESSION["user"]) ) {
-    return password_verify(TOKEN_SALT . $_SESSION["user"]["user_id"], $_SESSION["user"]["token"]);
+  if (isset($_SESSION["user"]["user_id"]) && isset($_SESSION["user"]["email"]) ) {
+    return password_verify(TOKEN_SALT . $_SESSION["user"]["user_id"] . $_SESSION["user"]["email"] , $_SESSION["user"]["token"]);
   }
   return false;
 }

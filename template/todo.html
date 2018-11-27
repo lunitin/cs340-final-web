@@ -150,10 +150,34 @@
         </div>
       </div>
 
+      <div class="modal fade" id="updateProfile" tabindex="-1" role="dialog" aria-labelledby="updateProfile" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="updateProfileLabel">Update Profile</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Cancel">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body px-4" id="addTaskBody">
+                <p class="font-weight-light"></p>
+                <div id="updateProfileFormContainer">
+                </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-danger rm" data-type="user" data-dismiss="modal">Delete Account</button>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary" id="submitUpdateProfile">Update Profile</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="invisible">
         <div id="delete-bucket">Are you sure? This will delete this bucket as well as all categories and tasks.</div>
         <div id="delete-category">Are you sure" This will delete this category and all tasks within.</div>
-        <div id="delete-task">Are you sure? This task will be deleted</div>
+        <div id="delete-task">Are you sure? This task will be deleted.</div>
+        <div id="delete-user">Are you sure? This will delete your account from the system.</div>
       </div>
 
     </div>

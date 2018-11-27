@@ -154,7 +154,7 @@ function create_cat() {
 
 
   } catch (\PDOException $e) {
-    $_SESSION["msg"]["danger"][] = "ERROR: PDO Exception on insert";
+    $_SESSION["msg"]["danger"][] = "ERROR: PDO Exception on insert.";
     return false;
   }
 
@@ -192,11 +192,9 @@ function update_cat() {
 
 
   } catch (\PDOException $e) {
-    $_SESSION["msg"]["danger"][] = "ERROR: PDO Exception on update:" . $e->getMessage();
+    $_SESSION["msg"]["danger"][] = "ERROR: PDO Exception on update.";
     return false;
   }
-
-
 }
 
 
@@ -224,7 +222,7 @@ function load_cat($cat_id) {
 
 
   } catch (\PDOException $e) {
-    $_SESSION["msg"]["danger"][] = "ERROR: PDO Exception on select";
+    $_SESSION["msg"]["danger"][] = "ERROR: PDO Exception on select.";
     return false;
   }
 

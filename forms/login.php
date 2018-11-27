@@ -41,17 +41,18 @@ function form_login() {
   });
 
   // Define all fields and add them all to the form
-  $field_def = array('email'  => 'Enter your E-mail address:',
-                     'pass'  => 'Enter a password:');
+  $field_def = array('email'  => 'E-mail address:',
+                     'pass'  => 'Password:');
 
   // Create a field set and add all fields to the form
-  $fieldset = $form->addElement('fieldset')->setLabel('User Information')->addClass('form-horizontal');
+  $fieldset = $form->addElement('fieldset')->addClass('form-horizontal');
 
   foreach ($field_def as $name => $msg) {
     $fields[$name] = $fieldset->addElement(
                     ( $name == 'pass' ? 'password' : 'text'),
                     $name)
                    ->setLabel($msg)
+                   ->addClass('form-control')
                    ->addRule('required', $name .' is required');
   }
 
@@ -102,7 +103,7 @@ function authenticate_user() {
       $_SESSION["user"]["name"] = $row["name"];
 
       // Create a simple token to verify that the browser is logged in
-      $_SESSION["user"]["token"] = password_hash(TOKEN_SALT .  $row["user_id"], PASSWORD_DEFAULT);
+      $_SESSION["user"]["token"] = password_hash(TOKEN_SALT .  $row["user_id"] . $row["email"], PASSWORD_DEFAULT);
       return true;
     }
 

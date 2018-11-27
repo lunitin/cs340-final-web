@@ -3,7 +3,18 @@ $( document ).ready(function() {
 
   // BUCKET EVENTS
   $('#addBucket').on('show.bs.modal', function (e) {
-    $.get( "forms/addbucket.php", function( data ) {
+
+    var caller = $(e.relatedTarget);
+    var bucket_id = '';
+
+    if (caller.attr('data-bucket-id')) {
+     bucket_id = "?bucket_id="+ caller.attr('data-bucket-id');
+     $('#submitAddBucket').html('Update Bucket');
+   } else {
+     $('#submitAddBucket').html('Add Bucket');
+   }
+
+    $.get( "forms/addbucket.php" + bucket_id, function( data ) {
       res = JSON.parse(data);
       parseFormResponse(res, "#addBucketFormContainer", "#addBucket" );
     });
@@ -13,6 +24,8 @@ $( document ).ready(function() {
   // Submit button function handler
   $('#submitAddBucket').click( function(data) {
     data = {};
+
+
     // Collect form data and send it back to QuickForm
     $('#add_bucket input, #add_bucket hidden').each(
         function(index){
@@ -40,7 +53,11 @@ $( document ).ready(function() {
     caller = $(e.relatedTarget);
     if (caller.attr('data-category-id')) {
      category_id = "&category_id="+ caller.attr('data-category-id');
-    }
+     $('#submitAddCategory').html('Update Category');
+   } else {
+     $('#submitAddCategory').html('Add Category');
+   }
+
     jQuery.get( "forms/addcategory.php?bucket_id="+ bucket_id + category_id, function( data ) {
       res = JSON.parse(data);
       parseFormResponse(res, "#addCategoryFormContainer", "#addCategory" );
@@ -83,8 +100,12 @@ $( document ).ready(function() {
       var bucket_id = $('#buckets li.active').attr('data-bucket-id');
       var category_id = caller.attr('data-category-id');
       var task_id = '';
+
       if (caller.attr('data-task-id')) {
         task_id = "&task_id="+ caller.attr('data-task-id');
+        $('#submitAddTask').html('Update Task');
+      } else {
+        $('#submitAddTask').html('Add Task');
       }
 
       jQuery.get( "forms/addtask.php?bucket_id="+bucket_id+"&category_id="+category_id + task_id, function( data ) {
@@ -116,6 +137,36 @@ $( document ).ready(function() {
         fetchCategories($('#buckets li.active').attr('data-bucket-id'));
       }
 
+    });
+  });
+
+
+
+  // PROFILE EVENTS
+  $('#updateProfile').on('show.bs.modal', function (e) {
+
+    $.get( "forms/profile.php", function( data ) {
+      res = JSON.parse(data);
+      parseFormResponse(res, "#updateProfileFormContainer", "#updateProfile" );
+    });
+
+  })
+
+  // Submit button function handler
+  $('#submitUpdateProfile').click( function(data) {
+    data = {};
+
+    // Collect form data and send it back to QuickForm
+    $('#update_profile input').each(
+        function(index){
+            var input = $(this);
+            data[input.attr('name')] = input.val();
+        }
+    );
+    // POST form data back to PHP
+    jQuery.post( "forms/profile.php", data, function( data ) {
+      res = JSON.parse(data);
+      parseFormResponse(res, "#updateProfileFormContainer", "#updateProfile" );
     });
   });
 

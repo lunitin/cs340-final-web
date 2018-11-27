@@ -44,16 +44,18 @@ function form_signup() {
   $field_def = array('name' => 'Name',
                      'email'     => 'E-mail address');
 
-  $fieldset = $form->addElement('fieldset')->setLabel('Create Account');
+  $fieldset = $form->addElement('fieldset');
 
   $age = $fieldset->addElement('text', 'name')
                 ->setLabel('Name:')
+                ->addClass('form-control')
                 ->addRule('Required', 'Name is required');
 
 
   // Add unique elements to the form with unique paramters and rules
   $user = $fieldset->addElement('text', 'email',
                   array('maxlength' => 20))
+                  ->addClass('form-control')
                  ->setLabel('Email Address:');
 
   $user->addRule('required', 'Email is required')
@@ -62,6 +64,7 @@ function form_signup() {
   // Leverage browser enforced length limits
   $pass = $fieldset->addElement('password', 'password',
                   array('minlength' => 6, 'maxlength' => 40))
+                  ->addClass('form-control')
                  ->setLabel('Password: (minimum length 6, maximum length 40)');
 
   // Add PHP based limits to stop direct _POST attempts from bypassing rules
@@ -153,7 +156,8 @@ function check_user() {
 
 
   } catch (\PDOException $e) {
-     print "<div class=\"error\"><span class=\"error\">ERROR: ". $e->getMessage() ."</span></div>\n";
+     $_SESSION["msg"]["danger"][]  = "ERROR: PDO Insert Error";
+     return false;
   }
 }
 
