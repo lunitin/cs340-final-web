@@ -1,6 +1,18 @@
 <?php
+/*********************************************************************
+** Program Filename: login.php
+** Author: Casey Dinsmore
+** Date: 2018-11-09
+** Description: Functions to present login form and processing to
+**              inject into the HTML template
+********************************************************************/
 
 
+/*********************************************************************
+** Function: form_login
+** Description: Render the login up form as html
+** Return: String
+*********************************************************************/
 function form_login() {
   $form = new HTML_QuickForm2('login', 'POST', array('action' => '/'));
 

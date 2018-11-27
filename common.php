@@ -77,15 +77,17 @@ function fetch_buckets() {
 ** Description: Fetch any categories for this user
 ** Return: array() of category tuples
 *********************************************************************/
-function fetch_categories() {
+function fetch_categories($bucket_id) {
 
   try {
     $sql = $GLOBALS["db"]->prepare('SELECT *
                                     FROM categories
                                     WHERE user_id=:user_id
+                                    AND bucket_id=:bucket_id
                                     ORDER by sort_weight');
 
     $sql->bindParam(':user_id', $_SESSION["user"]["user_id"]);
+    $sql->bindParam(':bucket_id', $bucket_id);
     $sql->execute();
     $rows = $sql->fetchAll();
 

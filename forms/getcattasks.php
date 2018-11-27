@@ -1,4 +1,10 @@
 <?php
+/*********************************************************************
+** Program Filename: getcattasks.php
+** Author: Casey Dinsmore
+** Date: 2018-11-22
+** Description: Provide Categories and Tasks via JSON to the frontend
+********************************************************************/
 include_once("../config.php");
 include_once("../common.php");
 
@@ -9,7 +15,7 @@ if (verify_login()) {
 
   $bucket_id = (int) $_GET["bucket_id"];
 
-  $resp['categories'] = fetch_categories();
+  $resp['categories'] = fetch_categories($bucket_id);
   $resp['tasks'] = fetch_tasks($bucket_id);
   $code = 200;
 

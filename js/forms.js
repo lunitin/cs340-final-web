@@ -4,7 +4,8 @@ $( document ).ready(function() {
   // BUCKET EVENTS
   $('#addBucket').on('show.bs.modal', function (e) {
     $.get( "forms/addbucket.php", function( data ) {
-      parseFormResponse(data, "#addBucketFormContainer", "#addBucket" );
+      res = JSON.parse(data);
+      parseFormResponse(res, "#addBucketFormContainer", "#addBucket" );
     });
 
   })
@@ -13,7 +14,7 @@ $( document ).ready(function() {
   $('#submitAddBucket').click( function(data) {
     data = {};
     // Collect form data and send it back to QuickForm
-    $('#add_bucket input').each(
+    $('#add_bucket input, #add_bucket hidden').each(
         function(index){
             var input = $(this);
             data[input.attr('name')] = input.val();
@@ -21,7 +22,8 @@ $( document ).ready(function() {
     );
     // POST form data back to PHP and update bucket containers
     jQuery.post( "forms/addbucket.php", data, function( data ) {
-      parseFormResponse(data, "#addBucketFormContainer", "#addBucket" );
+      res = JSON.parse(data);
+      parseFormResponse(res, "#addBucketFormContainer", "#addBucket" );
       fetchBuckets();
     });
   });
@@ -32,18 +34,24 @@ $( document ).ready(function() {
   // Fetch the form and put it in the modal on click
   $('#addCategory').on('show.bs.modal', function (e) {
 
-   var bucket_id = $('#buckets li.active').attr('data-bucket-id');
+    var bucket_id = $('#buckets li.active').attr('data-bucket-id');
 
-      jQuery.get( "forms/addcategory.php?bucket_id="+ bucket_id, function( data ) {
-        parseFormResponse(data, "#addCategoryFormContainer", "#addCategory" );
-      });
-    })
+    var category_id = '';
+    caller = $(e.relatedTarget);
+    if (caller.attr('data-category-id')) {
+     category_id = "&category_id="+ caller.attr('data-category-id');
+    }
+    jQuery.get( "forms/addcategory.php?bucket_id="+ bucket_id + category_id, function( data ) {
+      res = JSON.parse(data);
+      parseFormResponse(res, "#addCategoryFormContainer", "#addCategory" );
+    });
+  });
 
   // Submit button function handler
   $('#submitAddCategory').click( function(data) {
     data = {};
     // Collect form data and send it back to QuickForm
-    $('#add_category input, #add_category select').each(
+    $('#add_category input, #add_category select,  #add_category hidden').each(
         function(index){
             var input = $(this);
             data[input.attr('name')] = input.val();
@@ -51,26 +59,37 @@ $( document ).ready(function() {
     );
 
     data['bucket_id'] = $('#buckets li.active').attr('data-bucket-id');
+
     // POST form data back to PHP
     jQuery.post( "forms/addcategory.php", data, function( data ) {
-      parseFormResponse(data, "#addCategoryFormContainer", "#addCategory" );
+      res = JSON.parse(data);
+      parseFormResponse(res, "#addCategoryFormContainer", "#addCategory" );
+
+      // If we had a successful insert, rebuild category view for this bucket
+      if (res.code == 201) {
+        fetchCategories($('#buckets li.active').attr('data-bucket-id'));
+      }
     });
   });
 
   // TASK EVENTS
   $('#addTask').on('show.bs.modal', function (e) {
 
-      // Save the category id of the caller on the submit  button
-      // for easy access on submit
+      // Save the category id of the caller on the submit button
+      // for easy access on form submit
       caller = $(e.relatedTarget);
-      console.log(caller.attr('data-category-id'));
       $('#submitAddTask').attr('data-category-id', caller.attr('data-category-id'));
 
       var bucket_id = $('#buckets li.active').attr('data-bucket-id');
       var category_id = caller.attr('data-category-id');
+      var task_id = '';
+      if (caller.attr('data-task-id')) {
+        task_id = "&task_id="+ caller.attr('data-task-id');
+      }
 
-      jQuery.get( "forms/addtask.php?bucket_id="+bucket_id+"&category_id="+category_id, function( data ) {
-        parseFormResponse(data, "#addTaskFormContainer", "#addTask" );
+      jQuery.get( "forms/addtask.php?bucket_id="+bucket_id+"&category_id="+category_id + task_id, function( data ) {
+        res = JSON.parse(data);
+        parseFormResponse(res, "#addTaskFormContainer", "#addTask" );
       });
     })
 
@@ -78,7 +97,7 @@ $( document ).ready(function() {
   $('#submitAddTask').click( function(data) {
     data = {};
     // Collect form data and send it back to QuickForm
-    $('#add_task input, #add_task select').each(
+    $('#add_task input, #add_task select, #add_task textarea,  #add_task hidden').each(
         function(index){
             var input = $(this);
             data[input.attr('name')] = input.val();
@@ -87,11 +106,16 @@ $( document ).ready(function() {
     data['bucket_id'] = $('#buckets li.active').attr('data-bucket-id');
     data['category_id'] = $('#submitAddTask').attr('data-category-id');
 
-    console.log(data);
-
     // POST form data back to PHP
     jQuery.post( "forms/addtask.php", data, function( data ) {
-      parseFormResponse(data, "#addTaskFormContainer", "#addTask" );
+      res = JSON.parse(data);
+      parseFormResponse(res, "#addTaskFormContainer", "#addTask" );
+
+      // If we had a successful insert, inject a new task object
+      if (res.code == 201) {
+        fetchCategories($('#buckets li.active').attr('data-bucket-id'));
+      }
+
     });
   });
 
@@ -108,8 +132,8 @@ $( document ).ready(function() {
 **             modal - ID of modal container
 ** Return: none
 *********************************************************************/
-function parseFormResponse(data, elem, modal) {
-  res = JSON.parse(data);
+function parseFormResponse(res, elem, modal) {
+
   if (res.code < 300) {
     $(elem).html(res.html);
   }
@@ -134,7 +158,6 @@ function parseAlerts(alerts) {
     if (! $.isEmptyObject(alerts['danger'])) {
       if (Object.keys(alerts['danger']).length > 0) {
         for (var j = 0; j < alerts['danger'].length; j++) {
-            console.log(alerts['danger'][j]);
             $('#messages').append(buildAlert('alert-danger', alerts['danger'][j]))
           }
       }
@@ -142,7 +165,6 @@ function parseAlerts(alerts) {
     if (! $.isEmptyObject(alerts['success'])) {
       if (Object.keys(alerts['success']).length > 0) {
         for (var j = 0; j < alerts['success'].length; j++) {
-            console.log(alerts['success'][j]);
             $('#messages').append(buildAlert('alert-success', alerts['success'][j]))
           }
       }

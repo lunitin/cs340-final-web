@@ -33,7 +33,7 @@ $data = array(
 switch($page) {
 
   case '4':
-    $data['STR_TITLE'] = "Todo List";
+    $data['STR_TITLE'] = '';
     $data['STR_BODY'] = '';
     $template = file_get_contents('template/todo.html');
     break;

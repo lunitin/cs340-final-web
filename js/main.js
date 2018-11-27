@@ -1,4 +1,13 @@
+/*********************************************************************
+** Program Filename: main.js
+** Author: Casey Dinsmore
+** Date: 2018-11-24
+** Description: Core JS button events and data fetch functions.
+********************************************************************/
+
 $( document ).ready(function() {
+
+  //  $("#rmBucket").confirmation('show');
 
     // Fade out PHP generated alerts
     $(".alert").fadeTo(3500, 600).slideUp(400, function () {
@@ -10,14 +19,13 @@ $( document ).ready(function() {
     // BUCKET HANDKERS
     // Clicks on new and future bucket nav items
     $( '#buckets' ).on( 'click', 'li', function( event ) {
-      console.log( this );
         fetchBuckets(this);
     });
 
 
     // Inject bucket objects
     // which will in turn inject category Objects
-    // which will then ibject task objects
+    // which will then inject task objects
     fetchBuckets();
 
 
@@ -28,38 +36,31 @@ $( document ).ready(function() {
        console.log( $(this).attr('data-category-id'));
     });
 
-    // DELETE CATEGORY
-    $( '#categories' ).on( 'click', 'i.c-rm', function( event ) {
-      console.log('Rm category');
-       console.log( $(this).attr('data-category-id') );
-    });
 
 
     // TASK HANDLERS
-    // CREATE TASK
-    // $( '#categories' ).on( 'click', 'i.t-add', function( event ) {
-    //   console.log('Add task');
-    //    console.log( $(this).attr('data-category-id') );
-    // });
 
     // EDIT TASK
     $( '#categories' ).on( 'click', 'i.t-edit', function( event ) {
       console.log('Edit task');
-       console.log( $(this).attr('data-task-id'));
+
+       jQuery.get( "forms/addtask.php?task_id="+ $(this).attr('data-task-id'), function( data ) {
+         res = JSON.parse(data);
+         parseFormResponse(res, "#addTaskFormContainer", "#addTask" );
+       });
     });
 
     // DELETE TASK
-    $( '#categories' ).on( 'click', 'i.t-rm', function( event ) {
-      console.log('Rm task');
-       console.log( $(this).attr('data-task-id') );
+    $( 'body' ).on( 'click', 'i.rm', function( event ) {
+      deleteItem($(this));
     });
 
 
     // DRAGGING 7 DROPPING TASKS
     // Attach Event to Category container for dragging of task rows
-    $( '#categories' ).on( 'click', 'li.list-group-item', function( event ) {
-      console.log( this );
-    });
+    // $( '#categories' ).on( 'click', 'li.list-group-item', function( event ) {
+    //   console.log( this );
+    // });
 
     // Construct Task objects
 
@@ -89,10 +90,11 @@ function fetchBuckets(elem) {
     resp = JSON.parse(data);
     buckets = resp.buckets;
 
+    // Empty any buckets incase of add/update/delete/resort
     $('#buckets').empty();
 
-    console.log(resp);
-
+    // If we got a bucket array from the backend
+    // Loop through and add them to the #buckets ul
     if (buckets.length > 0 ) {
 
       var html = '';
@@ -101,22 +103,20 @@ function fetchBuckets(elem) {
         var item = document.createElement("li");
         var link = document.createElement("a");
         var id = 'bucket_' + buckets[i]['bucket_id'];
-        var current = '';
-        // If nothing was clicked, set the first bucket as default
-        if ($.isEmptyObject(elem) && i == 0 ||
-            !$.isEmptyObject(elem) && elem.id == id) {
 
-          current = id;
+        // If this bucket is the active bucket, add the class
+        // and update the bucket id attribute
+        if ($.isEmptyObject(elem) && i == 0 ||
+           !$.isEmptyObject(elem) && elem.id == id) {
+
           item.classList.add('active');
           item.setAttribute('data-bucket-id', buckets[i]['bucket_id']);
-          $('#bucketTitle').html( buckets[i]['bucket_title']);
-          $('#addNewCategory, #rmBucket').attr('data-bucket-id', buckets[i]['bucket_id']);
+
+          updateBucketElements(buckets[i]);
 
           // Load categories for the default bucket
           fetchCategories(buckets[i]['bucket_id']);
         }
-
-
 
         // Build nav links and inject into #buckets ul
         item.id = id;
@@ -129,8 +129,9 @@ function fetchBuckets(elem) {
 
       }
     }
+
     // Append the add bucket item cheaply by using a string
-    html +='<li class="nav-item">'
+    html ='<li class="nav-item">'
            + '<a class="nav-link" title="Add Bucket" href="#" data-toggle="modal" data-target="#addBucket"><i class="fas fa-folder-plus fa-lg"></i></a></li>';
     $('#buckets').append(html);
 
@@ -141,6 +142,23 @@ function fetchBuckets(elem) {
 }
 
 
+
+/*********************************************************************
+** Function: bucketActions
+** Description: Create the bucket action buttons
+** Parameters: alerts object
+** Return: none
+*********************************************************************/
+function updateBucketElements(bucket) {
+
+  $('#bucketTitle').html( bucket['bucket_title']);
+
+  $('#bucketActions').html('<i id="addNewCategory" title="Add Category"  data-bucket-id="" data-toggle="modal" data-target="#addCategory" class="far fa-plus-square fa-2x"></i>'
+    + '<i id="rmBucket" title="Delete Bucket" data-bucket-id="'+bucket['bucket_id'] +'" data-type="bucket" class="far fa-trash-alt fa-2x rm" ></i>');
+
+  $('#addNewCategory, #rmBucket').attr('data-bucket-id', );
+
+}
 
 /*********************************************************************
 ** Function: fetchBuckets
@@ -157,16 +175,15 @@ function fetchCategories(bucket_id) {
 
     resp = JSON.parse(data);
 
-
-    console.log('category loop');
-    console.log(resp);
+    // Empty any categories incase of add/update/delete/resort
+    $('#categories').empty();
 
     // Create Category containers
     if (resp.categories.length > 0) {
       // For every category, create a container
       for(i = 0; i < resp.categories.length; i++) {
         // for every container, create a container object
-        createContainer(resp.categories[i]);
+        createCategoryCard(resp.categories[i]);
       }
     }
 
@@ -185,27 +202,33 @@ function fetchCategories(bucket_id) {
 
 }
 
+/*********************************************************************
+** Function: createCategoryCard
+** Description: Handler to fetch buckets for the backend and display
+**     add them to the bucket container. Set the active class on the
+**     currently viewed bucket. Trigger the loading of
+**     categories and tasks for this bucket.
+** Parameters: alerts object
+** Return: none
+*********************************************************************/
+function createCategoryCard(category) {
 
-function createContainer(category) {
   category_id = 'category-' + category['category_id'];
   category_name = category['category_name'];
-//  console.log(category['category_name']);
-  //console.log(category_id);
 
   var card = '<div class="card bg-light mb-3" id="'+category_id+'">'
             +'  <div class="card-header">'
             +      category_name
             +'     <div class="float-right task-tools">'
-            +'      <i class="far fa-plus-square t-add" title="Add Task" data-toggle="modal" data-target="#addTask" data-category-id="'+ category_id +'"></i>'
-            +'      <i class="far fa-edit c-edit" title="Edit Category" data-category-id="'+category['category_id']+'"></i>'
-            +'      <i class="far fa-trash-alt c-rm" title="Delete category" data-category-id="'+category['category_id']+'"></i>'
+            +'      <i class="far fa-plus-square t-add" title="Add Task" data-toggle="modal" data-target="#addTask" data-category-id="'+ category['category_id'] +'"></i>'
+            +'      <i class="far fa-edit c-edit" title="Edit Category"  data-toggle="modal" data-target="#addCategory" data-category-id="'+category['category_id']+'"></i>'
+            +'      <i class="far fa-trash-alt rm" title="Delete category" data-type="category" data-category-id="'+category['category_id']+'"></i>'
             +'    </div>'
             +'  </div>'
             +'  <ul class="list-group list-group-flush" id="'+category_id+'-ul">'
             +'  </ul>'
             +' </div>'
             +'</div>';
-  //console.log(card);
 
   $('#categories').append(card);
 
@@ -215,15 +238,46 @@ function createTask(task) {
 
   category_id = 'category-'+ task['category_id'];
   task_id = 'task-' + task['task_id'];
-  // console.log('taskname'+task['task_name']);
-  // console.log('catid '+ category_id);
-  // console.log('taskid' +task_id);
 
   var task = '<li class="list-group-item">'+ task['task_name']
     + '<div class="float-right task-tools">'
-    + '  <i class="far fa-edit t-edit" title="Edit Task" data-task-id='+task['task_id']+'></i>'
-    + '<i class="far fa-trash-alt t-rm" title="Delete Task" data-task-id='+task['task_id']+'></i>'
+    + '  <i class="far fa-edit t-edit" title="Edit Task" data-toggle="modal" data-category-id="'+task['category_id']+'" data-target="#addTask" data-task-id='+task['task_id']+'></i>'
+    + '<i class="far fa-trash-alt rm" title="Delete Task" data-type="task" data-task-id='+task['task_id']+'></i>'
     + '</div></li>';
 
   $('#'+ category_id +'-ul').append(task);
+}
+
+/*********************************************************************
+** Function: deleteItem
+** Description: Handler used to delete buckets, categories, and tasks
+** Parameters: alerts object
+** Return: none
+*********************************************************************/
+function deleteItem(obj) {
+  var type = obj.attr('data-type');
+  var id = obj.attr('data-'+ type + '-id');
+
+  console.log(type + " : "+ id);
+  var msg = $('#delete-'+type).html();
+
+  if (confirm(msg)) {
+    jQuery.get( "forms/delete.php?type="+ type+"&id=" +id , function( data ) {
+      // Handle any alerts that were generated by the backend.
+      parseAlerts(resp['messages']);
+
+      if (type == 'bucket') {
+        $('#categories, #bucketTitle, #bucketActions').empty();
+        fetchBuckets();
+      } else {
+        fetchCategories($('#buckets li.active').attr('data-bucket-id'));
+      }
+    });
+
+  } else {
+
+  }
+
+
+
 }
