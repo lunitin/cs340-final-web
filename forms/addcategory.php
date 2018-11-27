@@ -22,6 +22,7 @@ if (verify_login()) {
     // Set defaults for the form elements
     $form->addDataSource(new HTML_QuickForm2_DataSource_Array($defaults));
     $form->addElement('hidden', 'category_id');
+    $form->addElement('hidden', 'bucket_id');
   } else {
     $defaults = ( count($_POST) > 0 ? $_POST : $_GET);
     // Set defaults for the form elements
@@ -40,19 +41,6 @@ if (verify_login()) {
                  ->setLabel('Category Name:')
                  ->addClass('form-control')
                  ->addRule('required', 'Category Name is required');
-
-   // Fetch the bucket list and format for the select list
-   $bucks = fetch_buckets();
-   foreach($bucks as $k => $v) {
-     $bopts[$v["bucket_id"]] = $v["bucket_name"];
-   }
-   $buckets = $fieldset->addElement(
-                   'select',
-                   'bucket_id')
-                   ->loadOptions($bopts)
-                  ->setLabel('Bucket:')
-                  ->addClass('form-control')
-                  ->addRule('required', 'Bucket is required');
 
   $code = 200;
   if ($form->validate()) {

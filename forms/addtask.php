@@ -16,6 +16,9 @@ if (verify_login()) {
 
   $form = new HTML_QuickForm2('add_task', 'POST');
 
+  $form->addElement('hidden', 'category_id');
+  $form->addElement('hidden', 'bucket_id');
+
   // Set the default values, this is used to auto select categories
   // and buckets allows the same form to be re-used for an edit operation
   if (isset($_GET["task_id"])) {
@@ -23,6 +26,7 @@ if (verify_login()) {
     // Set defaults for the form elements
     $form->addDataSource(new HTML_QuickForm2_DataSource_Array($defaults));
     $form->addElement('hidden', 'task_id');
+
   } else {
     $defaults = ( count($_POST) > 0 ? $_POST : $_GET);
     // Set defaults for the form elements
@@ -50,35 +54,6 @@ if (verify_login()) {
                   array('size' => 50))
                   ->addClass('form-control')
                  ->setLabel('Task Details:');
-
-
-  // Fetch the bucket list and format for the select list
-  $bopts = array();
-  $bucks = fetch_buckets();
-  foreach($bucks as $k => $v) {
-    $bopts[$v["bucket_id"]] = $v["bucket_name"];
-  }
-  $bucket = $fieldset->addElement(
-                  'select',
-                  'bucket_id')
-                  ->loadOptions($bopts)
-                 ->setLabel('Bucket:')
-                 ->addClass('form-control')
-                 ->addRule('required', 'Bucket is required');
-
-  // Fetch the categopy list and format for the select list
-  $copts = array();
-  $cats = fetch_categories((int)$defaults['bucket_id']);
-  foreach($cats as $k => $v) {
-    $copts[$v["category_id"]] = $v["category_name"];
-  }
-  $category = $fieldset->addElement(
-                 'select',
-                 'category_id')
-                 ->loadOptions($copts)
-                ->setLabel('Category:')
-                ->addClass('form-control')
-                ->addRule('required', 'Category is required');
 
   $code = 200;
   if ($form->validate()) {
@@ -215,7 +190,7 @@ function update_task() {
 ** Return: Boolean - result of the insert statement
 *********************************************************************/
 function load_task($task_id) {
-  
+
   try {
 
     $sql = $GLOBALS["db"]->prepare('SELECT *

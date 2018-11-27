@@ -1,9 +1,10 @@
 <?php
 /*********************************************************************
-** Program Filename: addbucket.php
+** Program Filename: updatesorty.php
 ** Author: Casey Dinsmore
-** Date: 2018-11-22
-** Description: Provide Bucket form to the frontend via JSON
+** Date: 2018-11-26
+** Description: Update the sort order of tasks in a category and
+**              support movement between categories.
 ********************************************************************/
 include_once("../config.php");
 
@@ -12,58 +13,11 @@ $resp = array();
 // Check for authentication token
 if (verify_login()) {
 
-  $form = new HTML_QuickForm2('add_bucket', 'POST');
-
-  // Set the default values, this allows the same form to
-  // be re-used for an edit operation
-  if (isset($_GET["bucket_id"])) {
-    $defaults = load_bucket( (int) $_GET["bucket_id"]);
-    $form->addDataSource(new HTML_QuickForm2_DataSource_Array($defaults));
-    $form->addElement('hidden', 'bucket_id');
-  }
-
-  // Create a field set and add all fields to the form
-  $fieldset = $form->addElement('fieldset');
-
-  $name = $fieldset->addElement(
-                  ('text'),
-                  'bucket_name',
-                  array('size' => 50))
-                 ->setLabel('Bucket Name:')
-                 ->addClass('form-control')
-                 ->addRule('required', 'Bucket Name is required');
-
-   $title = $fieldset->addElement(
-                   ('text'),
-                   'bucket_title',
-                   array('size' => 50))
-                  ->setLabel('Bucket Title:')
-                  ->addClass('form-control')
-                  ->addRule('required', 'Bucket Title is required');
-
-  $code = 200;
-  if ($form->validate()) {
-
-    if (isset($_POST["bucket_id"])) {
-      $action = update_bucket();
-      $resp['bucket_id'] = $_POST["bucket_id"];
-    } else {
-      $action = create_bucket();
-      $resp['bucket_id'] = $GLOBALS["db"]->lastInsertId();
-    }
-
-    if ($action) {
+    if (update_sort()) {
       $code = '201';
-      $resp['bucket_id'] = $GLOBALS["db"]->lastInsertId();
     } else {
       $code = '501';
     }
-  }
-
-  // Render the form with custom Bootstrap classes
-  ob_start();
-  print $form->render(fetch_bootstrap_renderer());
-  $resp['html'] = ob_get_clean();
 
 } else {
   $code = 500;
@@ -80,34 +34,34 @@ print json_encode($resp);
 
 
 /*********************************************************************
-** Function: create_bucket
-** Description: Create a new task bucket
-** Return: Boolean - result of the insert statement
+** Function: update_sort
+** Description: Update the sort and category of a collection of tasks
+** Return: Boolean - result of the update statement(s)
 *********************************************************************/
-function create_bucket() {
+function update_sort() {
 
   try {
 
-    $sql = $GLOBALS["db"]->prepare('SELECT MAX(sort_weight) as next
-                                    FROM buckets
-                                    WHERE user_id=:user_id');
-    $sql->bindParam(':user_id', $_SESSION["user"]["user_id"]);
-    $sql->execute();
-    $row = $sql->fetch();
+    $sql = $GLOBALS["db"]->prepare('UPDATE tasks
+                                    SET
+                                    sort_weight = :sort_weight,
+                                    category_id = :category_id
+                                    WHERE task_id=:task_id
+                                    AND user_id= :user_id');
 
-    $weight = $row["next"] + 10;
+    foreach($_POST["sort"] as $cat => $task) {
 
-    $sql = $GLOBALS["db"]->prepare('INSERT INTO buckets
-                          (user_id, bucket_name, bucket_title, sort_weight)
-                          VALUES
-                          (:user_id, :bucket_name, :bucket_title, :sort_weight)');
+      foreach($task as $task_id => $sort_weight) {
 
+        $sql->bindParam(':user_id', $_SESSION["user"]["user_id"]);
+        $sql->bindParam(':category_id', $cat);
+        $sql->bindParam(':task_id', $task_id);
+        $sql->bindParam(':sort_weight', $sort_weight);
+        $sql->execute();
+      }
 
-    $sql->bindParam(':user_id', $_SESSION["user"]["user_id"]);
-    $sql->bindParam(':bucket_name', $_POST["bucket_name"]);
-    $sql->bindParam(':bucket_title', $_POST["bucket_title"]);
-    $sql->bindParam(':sort_weight', $weight);
-    $sql->execute();
+    }
+    return true;
 
   } catch (\PDOException $e) {
     $_SESSION["msg"]["danger"][] = "ERROR: PDO Exception on insert.";
