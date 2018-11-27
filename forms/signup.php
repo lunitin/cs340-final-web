@@ -1,6 +1,6 @@
 <?php
 /*********************************************************************
-** Program Filename: sign-up.php
+** Program Filename: signup.php
 ** Author: Casey Dinsmore
 ** Date: 2018-11-09
 ** Description: Provide an interface to sign up for an account for the
@@ -17,42 +17,14 @@ function form_signup() {
 
   $form = new HTML_QuickForm2('signup', 'POST', array('action' => '/signup'));
 
-  // Create a custom renderer for BootStrap
-  $r = HTML_QuickForm2_Renderer::factory('callback');
-  $r->setCallbackForClass('HTML_QuickForm2_Element', function($renderer, $element) {
-      $error = $element->getError();
-      if ($error) {
-          $html[] = '<div class="clearfix form-group">';
-          $element->addClass('is-invalid');
-      } else {
-          $html[] = '<div class="clearfix form-group">';
-      }
-      $html[] = $renderer->renderLabel($element->addClass('red'));
-      $html[] = '<div class="input">'.$element;
-      if ($error) {
-          $html[] = '<span class="invalid-feedback">'.$error.'</span>';
-      } else {
-          $label = $element->getLabel();
-        if (is_array($label) && !empty($label[1])) {
-              $html[] = '<span class=" valid-feedback">'.$label[1].'</span>';
-        }
-      }
-      $html[] = '</div></div>';
-      return implode('', $html);
-  });
-
-  $field_def = array('name' => 'Name',
-                     'email'     => 'E-mail address');
-
   $fieldset = $form->addElement('fieldset');
 
-  $age = $fieldset->addElement('text', 'name')
+  $name = $fieldset->addElement('text', 'name')
                 ->setLabel('Name:')
                 ->addClass('form-control')
                 ->addRule('Required', 'Name is required');
 
 
-  // Add unique elements to the form with unique paramters and rules
   $user = $fieldset->addElement('text', 'email',
                   array('maxlength' => 20))
                   ->addClass('form-control')
@@ -72,9 +44,9 @@ function form_signup() {
        ->and_($pass->addRule('minlength', 'Minimum length is 6', 6))
        ->and_($pass->addRule('maxlength', 'Maximum length is 40', 40));
 
-
-         $fieldset->addElement('static')->setContent('
-         <a href="/" class="btn btn-default active" role="button">Cancel</a>
+  // Add Bootstrap style buttons
+  $fieldset->addElement('static')->setContent('
+       <a href="/" class="btn btn-default active" role="button">Cancel</a>
        <input type="submit" class="btn btn-primary" value="Sign Up">');
 
 
@@ -87,10 +59,10 @@ function form_signup() {
     $html = $form;
   }
 
+  // Render the form with custom Bootstrap classes
   ob_start();
-  print $form->render($r);
-  $html = ob_get_clean();
-  return $html;
+  print $form->render(fetch_bootstrap_renderer());
+  return ob_get_clean();
 
 }
 
@@ -103,12 +75,9 @@ function form_signup() {
 function save_user() {
 
   // Extract the password and hash it
-  // @NOTE: salt parameter has been deprecated, will use internal salt algo
   $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
-  // Construct an INSERT PDO query and send it to the DB
   try {
-
 
     $sql = $GLOBALS["db"]->prepare('INSERT INTO user
                                  (name,  email,  pass)
@@ -123,7 +92,6 @@ function save_user() {
      return true;
    } else {
      $_SESSION["msg"]["danger"][] = "There was a problem processing your registration.";
-
    }
 
   } catch (\PDOException $e) {
@@ -133,13 +101,14 @@ function save_user() {
    return false;
 }
 
+
 /*********************************************************************
 ** Function: check_user
 ** Description: Check if a user exists in the database
 ** Return: Boolean - status of insert query
 *********************************************************************/
 function check_user() {
-  // Construct an INSERT PDO query and send it to the DB
+
   try {
 
     $sql = $GLOBALS['db']->prepare('SELECT email
@@ -147,9 +116,7 @@ function check_user() {
                           WHERE email=:email');
 
     $sql->bindParam(':email', $_POST['email']);
-
     $sql->execute();
-
     $row = $sql->fetch();
 
     return ($row['email'] != $_POST["email"]);

@@ -13,32 +13,7 @@ $resp = array();
 // Check for authentication token
 if (verify_login()) {
 
-
   $form = new HTML_QuickForm2('add_category', 'POST');
-
-  // Create a custom renderer for BootStrap
-  $r = HTML_QuickForm2_Renderer::factory('callback');
-  $r->setCallbackForClass('HTML_QuickForm2_Element', function($renderer, $element) {
-      $error = $element->getError();
-      if ($error) {
-          $html[] = '<div class="clearfix form-group">';
-          $element->addClass('is-invalid');
-      } else {
-          $html[] = '<div class="clearfix form-group">';
-      }
-      $html[] = $renderer->renderLabel($element->addClass('red'));
-      $html[] = '<div class="input">'.$element;
-      if ($error) {
-          $html[] = '<span class="invalid-feedback">'.$error.'</span>';
-      } else {
-          $label = $element->getLabel();
-        if (is_array($label) && !empty($label[1])) {
-              $html[] = '<span class=" valid-feedback">'.$label[1].'</span>';
-        }
-      }
-      $html[] = '</div></div>';
-      return implode('', $html);
-  });
 
   // Set the default values, this is used to auto select categories
   // and allows the same form to be re-used for an edit operation
@@ -55,12 +30,8 @@ if (verify_login()) {
     )));
   }
 
-
-
-
-
   // Create a field set and add all fields to the form
-  $fieldset = $form->addElement('fieldset')->addClass('form-horizontal');
+  $fieldset = $form->addElement('fieldset');
 
   $name = $fieldset->addElement(
                   ('text'),
@@ -103,9 +74,9 @@ if (verify_login()) {
 
   }
 
-  // Create a JSON object to send back to the frontend
+  // Render the form with custom Bootstrap classes
   ob_start();
-  print $form->render($r);
+  print $form->render(fetch_bootstrap_renderer());
   $resp['html'] = ob_get_clean();
 
 } else {
@@ -120,6 +91,7 @@ $resp['messages'] = $_SESSION["msg"];
 $_SESSION["msg"] = array();
 
 print json_encode($resp);
+
 
 /*********************************************************************
 ** Function: create_bucket
@@ -152,18 +124,16 @@ function create_cat() {
 
     return true;
 
-
   } catch (\PDOException $e) {
     $_SESSION["msg"]["danger"][] = "ERROR: PDO Exception on insert.";
     return false;
   }
-
-
 }
+
 
 /*********************************************************************
 ** Function: update_cat
-** Description: Update an existing Category
+** Description: Update an existing category
 ** Return: Boolean - result of the update query
 *********************************************************************/
 function update_cat() {

@@ -14,7 +14,7 @@ session_start();
 if (!isset($_SESSION["msg"]))
   $_SESSION["msg"] = array();
 
-  
+
 // Show errors for testing - Disable for prod
 ini_set('display_errors', 'on');
 
@@ -23,7 +23,7 @@ define('DB_HOST', '127.0.0.1');
 define('DB_USER', 'todo');
 define('DB_DSN', 'mysql:host='.DB_HOST.';dbname='.DB_NAME.';charset=utf8mb4');
 
-// Password is kept outside docroot and will set DB_PASS and TOKEN_SALT
+// Password is outside docroot and will set DB_PASS and TOKEN_SALT
 include_once('/srv/clients/c2ws/www/config/todo-config.php');
 
 // Initiate PDO handler

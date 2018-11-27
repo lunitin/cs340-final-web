@@ -2,7 +2,7 @@
 /*********************************************************************
 ** Program Filename: profile.php
 ** Author: Casey Dinsmore
-** Date: 2018-11-09
+** Date: 2018-11-25
 ** Description: Provide a simple form to display and update user data.
 ********************************************************************/
 include_once("../config.php");
@@ -13,32 +13,7 @@ $resp = array();
 // Check for authentication token
 if (verify_login()) {
 
-
   $form = new HTML_QuickForm2('update_profile', 'POST');
-
-  // Create a custom renderer for BootStrap
-  $r = HTML_QuickForm2_Renderer::factory('callback');
-  $r->setCallbackForClass('HTML_QuickForm2_Element', function($renderer, $element) {
-      $error = $element->getError();
-      if ($error) {
-          $html[] = '<div class="clearfix form-group">';
-          $element->addClass('is-invalid');
-      } else {
-          $html[] = '<div class="clearfix form-group">';
-      }
-      $html[] = $renderer->renderLabel($element->addClass('red'));
-      $html[] = '<div class="input">'.$element;
-      if ($error) {
-          $html[] = '<span class="invalid-feedback">'.$error.'</span>';
-      } else {
-          $label = $element->getLabel();
-        if (is_array($label) && !empty($label[1])) {
-              $html[] = '<span class=" valid-feedback">'.$label[1].'</span>';
-        }
-      }
-      $html[] = '</div></div>';
-      return implode('', $html);
-  });
 
   // Set defaults for the form elements
   $form->addDataSource(new HTML_QuickForm2_DataSource_Array($_SESSION["user"]));
@@ -52,29 +27,26 @@ if (verify_login()) {
                 ->addClass('form-control')
                 ->addRule('Required', 'Name is required');
 
-
-  // Add unique elements to the form with unique paramters and rules
   $user = $fieldset->addElement('text', 'email',
                   array('maxlength' => 20, 'disabled' => true))
                   ->addClass('form-control')
                  ->setLabel('Email Address:');
 
   // Leverage browser enforced length limits
+  $curpass = $fieldset->addElement('password', 'cur_password',
+                  array('minlength' => 6, 'maxlength' => 40))
+                  ->addClass('form-control')
+                 ->setLabel('Current Password:');
 
-    $curpass = $fieldset->addElement('password', 'cur_password',
-                    array('minlength' => 6, 'maxlength' => 40))
-                    ->addClass('form-control')
-                   ->setLabel('Current Password:');
+  $newpass = $fieldset->addElement('password', 'new_password',
+                  array('minlength' => 6, 'maxlength' => 40))
+                  ->addClass('form-control')
+                 ->setLabel('New Password: (minimum length 6, maximum length 40)');
 
-    $newpass = $fieldset->addElement('password', 'new_password',
-                    array('minlength' => 6, 'maxlength' => 40))
-                    ->addClass('form-control')
-                   ->setLabel('New Password: (minimum length 6, maximum length 40)');
-
-     $newpass2 = $fieldset->addElement('password', 'new_password2',
-                     array('minlength' => 6, 'maxlength' => 40))
-                     ->addClass('form-control')
-                    ->setLabel('Confirm New Password:');
+   $newpass2 = $fieldset->addElement('password', 'new_password2',
+                   array('minlength' => 6, 'maxlength' => 40))
+                   ->addClass('form-control')
+                  ->setLabel('Confirm New Password:');
 
   // Only add password rules if the user filled out the fields
   if (!empty($_POST["cur_password"]) ||
@@ -93,7 +65,6 @@ if (verify_login()) {
 
   }
 
-
   $code = 200;
   if ($form->validate()) {
     if (update_user()) {
@@ -101,8 +72,9 @@ if (verify_login()) {
     }
   }
 
+  // Render the form with custom Bootstrap classes
   ob_start();
-  print $form->render($r);
+  print $form->render(fetch_bootstrap_renderer());
   $resp['html'] = ob_get_clean();
 
 } else {
@@ -125,11 +97,6 @@ print json_encode($resp);
 *********************************************************************/
 function update_user() {
 
-  // Extract the password and hash it
-  // @NOTE: salt parameter has been deprecated, will use internal salt algo
-  //$password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-
-  // Construct an INSERT PDO query and send it to the DB
   try {
 
     // No password changes
@@ -187,7 +154,6 @@ function update_user() {
 *********************************************************************/
 function check_curpass() {
 
-  // Construct an INSERT PDO query and send it to the DB
   try {
 
     $sql = $GLOBALS["db"]->prepare('SELECT *

@@ -14,38 +14,15 @@
 ** Return: String
 *********************************************************************/
 function form_login() {
-  $form = new HTML_QuickForm2('login', 'POST', array('action' => '/'));
 
-  // Create a custom renderer for BootStrap
-  $r = HTML_QuickForm2_Renderer::factory('callback');
-  $r->setCallbackForClass('HTML_QuickForm2_Element', function($renderer, $element) {
-      $error = $element->getError();
-      if ($error) {
-          $html[] = '<div class="clearfix form-group">';
-          $element->addClass('is-invalid');
-      } else {
-          $html[] = '<div class="clearfix form-group">';
-      }
-      $html[] = $renderer->renderLabel($element->addClass('red'));
-      $html[] = '<div class="input">'.$element;
-      if ($error) {
-          $html[] = '<span class="invalid-feedback">'.$error.'</span>';
-      } else {
-          $label = $element->getLabel();
-        if (is_array($label) && !empty($label[1])) {
-              $html[] = '<span class=" valid-feedback">'.$label[1].'</span>';
-        }
-      }
-      $html[] = '</div></div>';
-      return implode('', $html);
-  });
+  $form = new HTML_QuickForm2('login', 'POST', array('action' => '/'));
 
   // Define all fields and add them all to the form
   $field_def = array('email'  => 'E-mail address:',
                      'pass'  => 'Password:');
 
   // Create a field set and add all fields to the form
-  $fieldset = $form->addElement('fieldset')->addClass('form-horizontal');
+  $fieldset = $form->addElement('fieldset');
 
   foreach ($field_def as $name => $msg) {
     $fields[$name] = $fieldset->addElement(
@@ -56,6 +33,7 @@ function form_login() {
                    ->addRule('required', $name .' is required');
   }
 
+  // Add Bootstrap style buttons
   $fieldset->addElement('static')->setContent('
     <a href="/signup" class="btn btn-success active" role="button">Sign Up</a>
     <input type="submit" class="btn btn-primary" value="Login">');
@@ -71,12 +49,13 @@ function form_login() {
     exit;
   }
 
+  // Render the form with custom Bootstrap classes
   ob_start();
-  print $form->render($r);
-  $html = ob_get_clean();
-  return $html;
+  print $form->render(fetch_bootstrap_renderer());
+  return ob_get_clean();
 
 }
+
 
 /*********************************************************************
 ** Function: authenticate_user
@@ -114,8 +93,6 @@ function authenticate_user() {
     $_SESSION["msg"]["danger"][] = "PDO Exception";
       return false;
   }
-
-
 }
 
 ?>

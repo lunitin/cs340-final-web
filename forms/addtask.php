@@ -16,32 +16,8 @@ if (verify_login()) {
 
   $form = new HTML_QuickForm2('add_task', 'POST');
 
-  // Create a custom renderer for BootStrap
-  $r = HTML_QuickForm2_Renderer::factory('callback');
-  $r->setCallbackForClass('HTML_QuickForm2_Element', function($renderer, $element) {
-      $error = $element->getError();
-      if ($error) {
-          $html[] = '<div class="clearfix form-group">';
-          $element->addClass('is-invalid');
-      } else {
-          $html[] = '<div class="clearfix form-group">';
-      }
-      $html[] = $renderer->renderLabel($element->addClass('red'));
-      $html[] = '<div class="input">'.$element;
-      if ($error) {
-          $html[] = '<span class="invalid-feedback">'.$error.'</span>';
-      } else {
-          $label = $element->getLabel();
-        if (is_array($label) && !empty($label[1])) {
-              $html[] = '<span class=" valid-feedback">'.$label[1].'</span>';
-        }
-      }
-      $html[] = '</div></div>';
-      return implode('', $html);
-  });
-
   // Set the default values, this is used to auto select categories
-  // and allows the same form to be re-used for an edit operation
+  // and buckets allows the same form to be re-used for an edit operation
   if (isset($_GET["task_id"])) {
     $defaults = load_task( (int) $_GET["task_id"]);
     // Set defaults for the form elements
@@ -67,7 +43,6 @@ if (verify_login()) {
                 ->setLabel('Task Name:')
                 ->addClass('form-control')
                 ->addRule('required', 'Task Name is required');
-
 
   $title = $fieldset->addElement(
                   ('textarea'),
@@ -105,8 +80,6 @@ if (verify_login()) {
                 ->addClass('form-control')
                 ->addRule('required', 'Category is required');
 
-
-
   $code = 200;
   if ($form->validate()) {
 
@@ -129,10 +102,11 @@ if (verify_login()) {
 
   }
 
-  // Create a JSON object to send back to the frontend
+  // Render the form with custom Bootstrap classes
   ob_start();
-  print $form->render($r);
+  print $form->render(fetch_bootstrap_renderer());
   $resp['html'] = ob_get_clean();
+
 } else {
   $code = 500;
   $_SESSION["msg"]["danger"][] = "Not authorized.";
@@ -146,12 +120,14 @@ $_SESSION["msg"] = array();
 
 print json_encode($resp);
 
+
 /*********************************************************************
 ** Function: create_task
-** Description: Create a new task task
+** Description: Create a new task
 ** Return: Boolean - result of the insert statement
 *********************************************************************/
 function create_task() {
+
   try {
 
     $sql = $GLOBALS["db"]->prepare('SELECT MAX(sort_weight) as next
@@ -192,10 +168,11 @@ function create_task() {
 
 /*********************************************************************
 ** Function: update_task
-** Description: Create a new task task
-** Return: Boolean - result of the insert statement
+** Description: Update an existing task
+** Return: Boolean - result of the update statement
 *********************************************************************/
 function update_task() {
+
   try {
 
 
@@ -232,14 +209,13 @@ function update_task() {
 }
 
 
-
-
 /*********************************************************************
 ** Function: load_task
 ** Description: Load details of a task
 ** Return: Boolean - result of the insert statement
 *********************************************************************/
 function load_task($task_id) {
+  
   try {
 
     $sql = $GLOBALS["db"]->prepare('SELECT *

@@ -14,40 +14,16 @@ if (verify_login()) {
 
   $form = new HTML_QuickForm2('add_bucket', 'POST');
 
-  // Create a custom renderer for BootStrap
-  $r = HTML_QuickForm2_Renderer::factory('callback');
-  $r->setCallbackForClass('HTML_QuickForm2_Element', function($renderer, $element) {
-      $error = $element->getError();
-      if ($error) {
-          $html[] = '<div class="clearfix form-group">';
-          $element->addClass('is-invalid');
-      } else {
-          $html[] = '<div class="clearfix form-group">';
-      }
-      $html[] = $renderer->renderLabel($element->addClass('red'));
-      $html[] = '<div class="input">'.$element;
-      if ($error) {
-          $html[] = '<span class="invalid-feedback">'.$error.'</span>';
-      } else {
-          $label = $element->getLabel();
-        if (is_array($label) && !empty($label[1])) {
-              $html[] = '<span class=" valid-feedback">'.$label[1].'</span>';
-        }
-      }
-      $html[] = '</div></div>';
-      return implode('', $html);
-  });
-
+  // Set the default values, this allows the same form to
+  // be re-used for an edit operation
   if (isset($_GET["bucket_id"])) {
     $defaults = load_bucket( (int) $_GET["bucket_id"]);
-    // Set defaults for the form elements
     $form->addDataSource(new HTML_QuickForm2_DataSource_Array($defaults));
     $form->addElement('hidden', 'bucket_id');
   }
 
-
   // Create a field set and add all fields to the form
-  $fieldset = $form->addElement('fieldset')->addClass('form-horizontal');
+  $fieldset = $form->addElement('fieldset');
 
   $name = $fieldset->addElement(
                   ('text'),
@@ -82,12 +58,11 @@ if (verify_login()) {
     } else {
       $code = '501';
     }
-
   }
 
-  // Create a JSON object to send back to the frontend
+  // Render the form with custom Bootstrap classes
   ob_start();
-  print $form->render($r);
+  print $form->render(fetch_bootstrap_renderer());
   $resp['html'] = ob_get_clean();
 
 } else {
@@ -141,8 +116,8 @@ function create_bucket() {
     $_SESSION["msg"]["danger"][] = "ERROR: PDO Exception on insert.";
       return false;
   }
-
 }
+
 
 /*********************************************************************
 ** Function: update_bucket
@@ -180,6 +155,7 @@ function update_bucket() {
   }
 }
 
+
 /*********************************************************************
 ** Function: load_bucket
 ** Description: Load a single bucket from the db
@@ -205,7 +181,6 @@ function load_bucket($bucket_id) {
     $_SESSION["msg"]["danger"][] = "ERROR: PDO Exception on select.";
     return false;
   }
-
 }
 
 ?>

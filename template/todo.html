@@ -26,7 +26,16 @@
         <div class="collapse navbar-collapse" id="navbarCollapse">
           <ul class="navbar-nav mr-auto" id="buckets">
           </ul>
-          STR_ACTIONS
+          <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
+             <ul class="navbar-nav ml-auto">
+                 <li class="nav-item">
+                   <a class="nav-link" href="#profile"  data-toggle="modal" data-target="#updateProfile">Profile</a>
+                </li>
+                 <li class="nav-item">
+                     <a class="nav-link" href="/logout">Logout</a>
+                 </li>
+             </ul>
+          </div>
           </form>
         </div>
       </nav>
@@ -49,27 +58,6 @@
       <div class="px-1">
         STR_BODY
         <div id="categories">
-
-          <!--
-          <div class="card bg-light mb-3">
-            <div class="card-header">
-              Category 400
-              <div class="float-right task-tools">
-                <i class="far fa-plus-square t-add" title="Add Task" data-toggle="modal" data-target="#addTask" data-category-id="400"></i>
-                <i class="far fa-edit c-edit" title="Edit Category" data-category-id="400"></i>
-                <i class="far fa-trash-alt c-rm" title="Delete category" data-category-id="400"></i>
-              </div>
-            </div>
-            <ul class="list-group list-group-flush">
-              <li class="list-group-item">Task 1000
-                <div class="float-right task-tools">
-                  <i class="far fa-edit t-edit" title="Edit Task" data-task-id='1000'></i>
-                  <i class="far fa-trash-alt t-rm" title="Delete Task" data-task-id='1000'></i>
-                </div>
-              </li>
-            </ul>
-          </div>
-        -->
         </div>
       </div>
     </main>
@@ -81,8 +69,6 @@
       </div>
     </footer>
     <div id="#modalforms">
-
-
 
       <div class="modal fade" id="addBucket" tabindex="-1" role="dialog" aria-labelledby="addBucket" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -173,7 +159,7 @@
         </div>
       </div>
 
-      <div class="invisible">
+      <div class="d-none">
         <div id="delete-bucket">Are you sure? This will delete this bucket as well as all categories and tasks.</div>
         <div id="delete-category">Are you sure" This will delete this category and all tasks within.</div>
         <div id="delete-task">Are you sure? This task will be deleted.</div>
@@ -185,7 +171,6 @@
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-confirmation/1.0.7/bootstrap-confirmation.min.js" integrity="sha256-Srd8mQAtI70OG58r7ouxQ3uZ7+kiqKl5VpN+oe6/8FA=" crossorigin="anonymous"></script>
     <script src="/js/main.js"></script>
     <script src="/js/forms.js"></script>
   </body>

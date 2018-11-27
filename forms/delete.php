@@ -3,7 +3,7 @@
 ** Program Filename: delete.php
 ** Author: Casey Dinsmore
 ** Date: 2018-11-22
-** Description: Provide Deletion handling for multiple events
+** Description: Handle deletion for multiple entity types.
 ********************************************************************/
 include_once("../config.php");
 include_once("../common.php");
@@ -35,7 +35,8 @@ print json_encode($resp);
 function delete_item() {
 
   $code = 201;
-  // Look up table and primary key names
+
+  // Prepare different SQL for each entity type
   switch($_GET["type"]) {
     case 'bucket':
       $sql = $GLOBALS["db"]->prepare('DELETE FROM buckets WHERE user_id=:user_id AND bucket_id=:id');
@@ -58,7 +59,6 @@ function delete_item() {
       return 500;
   }
 
-
   try {
     $sql->bindParam(':user_id', $_SESSION["user"]["user_id"]);
     $sql->execute();
@@ -78,8 +78,6 @@ function delete_item() {
     $_SESSION["msg"]["danger"][] = "ERROR: PDO Exception on delete";
     return 500;
   }
-
-
 }
 
 ?>

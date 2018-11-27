@@ -15,6 +15,7 @@ if (verify_login()) {
 
   $bucket_id = (int) $_GET["bucket_id"];
 
+  // Fetch all categories and tasks in this bucket for this user_id
   $resp['categories'] = fetch_categories($bucket_id);
   $resp['tasks'] = fetch_tasks($bucket_id);
   $code = 200;
