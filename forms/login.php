@@ -30,7 +30,7 @@ function form_login() {
                     $name)
                    ->setLabel($msg)
                    ->addClass('form-control')
-                   ->addRule('required', $name .' is required');
+                   ->addRule('required', $msg .' is required');
   }
 
   // Add Bootstrap style buttons

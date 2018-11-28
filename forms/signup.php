@@ -46,7 +46,7 @@ function form_signup() {
 
   // Add Bootstrap style buttons
   $fieldset->addElement('static')->setContent('
-       <a href="/" class="btn btn-default active" role="button">Cancel</a>
+       <a href="/" class="btn btn-secondary " role="button">Cancel</a>
        <input type="submit" class="btn btn-primary" value="Sign Up">');
 
 
