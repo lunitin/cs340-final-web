@@ -13,6 +13,7 @@ $resp = array();
 // Check for authentication token
 if (verify_login()) {
 
+  // Return false to prevent the enter key from taking over POST operation in modal
   $form = new HTML_QuickForm2('add_category', 'POST');
 
   // Set the default values, this is used to auto select categories

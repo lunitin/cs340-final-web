@@ -14,6 +14,7 @@ $resp = array();
 // Check for authentication token
 if (verify_login()) {
 
+  // Return false to prevent the enter key from taking over POST operation in modal
   $form = new HTML_QuickForm2('add_task', 'POST');
 
   $form->addElement('hidden', 'category_id');

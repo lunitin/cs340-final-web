@@ -1,7 +1,12 @@
 $( document ).ready(function() {
 
+  // Disable enter in modal input fields or it does weird things
+  $('.modal').on('keypress', 'form input', function(e) {
+      return e.which !== 13;
+  });
 
   // BUCKET EVENTS
+  // Load the bucket form when modal is shown
   $('#addBucket').on('show.bs.modal', function (e) {
 
     var caller = $(e.relatedTarget);
@@ -9,22 +14,20 @@ $( document ).ready(function() {
 
     if (caller.attr('data-bucket-id')) {
      bucket_id = "?bucket_id="+ caller.attr('data-bucket-id');
-     $('#submitAddBucket').html('Update Bucket');
+     $('#submitAddBucket, #addBucketLabel').html('Update Bucket');
    } else {
-     $('#submitAddBucket').html('Add Bucket');
+     $('#submitAddBucket, #addBucketLabel').html('Add Bucket');
    }
 
     $.get( "forms/addbucket.php" + bucket_id, function( data ) {
       res = JSON.parse(data);
       parseFormResponse(res, "#addBucketFormContainer", "#addBucket" );
     });
-
   })
 
   // Submit button function handler
   $('#submitAddBucket').click( function(data) {
     data = {};
-
 
     // Collect form data and send it back to QuickForm
     $('#add_bucket input, #add_bucket hidden').each(
@@ -44,7 +47,7 @@ $( document ).ready(function() {
 
   // CATEGORY EVENTS
 
-  // Fetch the form and put it in the modal on click
+  // Load the category form when modal is shown
   $('#addCategory').on('show.bs.modal', function (e) {
 
     var bucket_id = $('#buckets li.active').attr('data-bucket-id');
@@ -53,9 +56,9 @@ $( document ).ready(function() {
     caller = $(e.relatedTarget);
     if (caller.attr('data-category-id')) {
      category_id = "&category_id="+ caller.attr('data-category-id');
-     $('#submitAddCategory').html('Update Category');
+     $('#submitAddCategory, #addCategoryLabel').html('Update Category');
    } else {
-     $('#submitAddCategory').html('Add Category');
+     $('#submitAddCategory, #addCategoryLabel').html('Add Category');
    }
 
     jQuery.get( "forms/addcategory.php?bucket_id="+ bucket_id + category_id, function( data ) {
@@ -90,6 +93,7 @@ $( document ).ready(function() {
   });
 
   // TASK EVENTS
+  // Load the task form when modal is shown
   $('#addTask').on('show.bs.modal', function (e) {
 
       // Save the category id of the caller on the submit button
@@ -103,9 +107,9 @@ $( document ).ready(function() {
 
       if (caller.attr('data-task-id')) {
         task_id = "&task_id="+ caller.attr('data-task-id');
-        $('#submitAddTask').html('Update Task');
+        $('#submitAddTask, #addTaskLabel').html('Update Task');
       } else {
-        $('#submitAddTask').html('Add Task');
+        $('#submitAddTask, #addTaskLabel').html('Add Task');
       }
 
       jQuery.get( "forms/addtask.php?bucket_id="+bucket_id+"&category_id="+category_id + task_id, function( data ) {
@@ -141,8 +145,8 @@ $( document ).ready(function() {
   });
 
 
-
   // PROFILE EVENTS
+  // Load the profile form when modal is shown
   $('#updateProfile').on('show.bs.modal', function (e) {
 
     $.get( "forms/profile.php", function( data ) {

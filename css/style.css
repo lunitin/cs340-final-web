@@ -1,16 +1,4 @@
- .footer {
-  background: #212529;
-  color: #fff
-}
-
 .required {
       color: #dc3545;
       margin-right: 5px;
-}
-#pageTitle i, .task-tools i {
-  margin: 0 5px 0 5px;
-}
-
-.nav-link {
-  width: 80px;
 }
